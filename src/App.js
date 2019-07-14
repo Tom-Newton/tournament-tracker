@@ -51,25 +51,23 @@ class App extends React.Component {
 export default App;
 
 function TabsBar(props) {
-  render () {
-    const tabs = props.tabs;
-    const tabsBar = tabs.tabNames.map((tabName, index) => {
-      return (
-        <Tab
-          key={tabName}
-          tabName={tabName}
-          active={index === tabs.activeTabIndex}
-          onClick={() => props.onClick(index)}
-        >
-        </Tab>
-      );
-    });
+  const tabs = props.tabs;
+  const tabsBar = tabs.tabNames.map((tabName, index) => {
     return (
-      <div className="tabsBar">
-        {tabsBar}
-      </div>
+      <Tab
+        key={tabName}
+        tabName={tabName}
+        active={index === tabs.activeTabIndex}
+        onClick={() => props.onClick(index)}
+      >
+      </Tab>
     );
-  }
+  });
+  return (
+    <div className="tabsBar">
+      {tabsBar}
+    </div>
+  );
 }
 
 function Tab(props) {
