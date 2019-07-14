@@ -25,7 +25,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="App">
+      <div className="App3">
         <header className="App-header">
 
         <TabsBar tabs={this.state.tabs} onClick={(index) => this.handleClick(index)}>
