@@ -24,3 +24,7 @@
 .tab.active {
   background-color: #ccc;
 }
+
+.playerEntry input:focus {
+  background-color: green;
+}
