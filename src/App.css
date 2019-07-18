@@ -25,6 +25,19 @@
   background-color: #ccc;
 }
 
-/* .playerEntry input:focus {
-  background-color: green;
-} */
+.playerInput {
+  margin: 2em;
+}
+
+.playerEntry.empty {
+  list-style-type: none;
+}
+
+.playerEntry {
+  font-size: 20pt;
+}
+
+.playerEntry input {
+  font-size: 20pt;
+  font-weight: bold;
+}

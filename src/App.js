@@ -32,7 +32,7 @@ class App extends React.Component {
         ],
         activeTabIndex: 0,
       },
-      players: ["player0", "player1", ""],
+      players: ["player0", "player1"],
     };
   }
 
@@ -63,91 +63,48 @@ class App extends React.Component {
 export default App;
 
 class PlayerInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      players: this.props.players,
-    };
-  }
-  // TODO: stop double rerenders due to handleChange and handleKeyDown
-  async handleChange (value, index) {
-    console.log("handle change")
-    this.setState((state) => {
-      const players = state.players.slice();
+  editPlayers (value, index) {
+      const players = this.props.players.slice();
       console.log(value)
-      players[index] = value;
-      if (players[players.length - 1]) {
-        players.push("")
+      console.log(index)
+      if (value) {
+        console.log("update value")
+        players[index] = value;
+      } else {
+        console.log("delete row")
+        players.splice(index, 1)
       }
-      return state.players = players;
-    });
+      console.log(players)
+      // if (players[players.length - 1]) {
+      //   players.push("")
+      // }
+      return players;
   }
 
-  async handleKeyDown (keyCode, index) {
-    console.log("handlekeydown")
-    this.setState((state) => {
-      const players = state.players.slice();
-      if (keyCode === 8 || keyCode === 13) {
-        if (keyCode === 8) {
-          // Backspace
-          if (!players[index] && index < players.length - 1) {
-            // Field is empty -> delete field and focus above
-            players.splice(index, 1);
-            // TODO: Stop this from backspacing on the line above
-            // document.getElementById(`inputField${index - 1}`).focus()
-          }
-        } else {
-          if (players[index]) {
-            if (players[index + 1]) {
-              // Next fieldis not empty -> add an empty field below
-              players.splice(index + 1, 0, "")
-            }
-            if (index < players.length - 1) {
-              // Focus field below
-              document.getElementById(`inputField${index + 1}`).focus()
-              console.log("Focused next line")
-            }
-          }
-        }
-      }
-        return state.players = players;
-      });
-
-    }
-
-  async handleBlur (index) {
-    console.log("handleBlur")
-    this.setState((state) => {
-      const players = this.state.players.slice();
-      if (!players[index] && index < players.length - 1) {
-        // Clicked off an empty field -> delete that field
-        players.splice(index, 1);
-        console.log("deleted line: " + index)
-        this.setState((state) => {
-          return state.players = players;
-        });
-      }
-    });
+  addPlayer (value) {
+    const players = this.props.players.slice();
+    players.push(value);
+    return players;
   }
 
   render () {
     // TODO: Probably shouldn't use index for the key here so rerendering is efficient
-    const playerEntries = this.state.players.map((player, index) => {
+    const players = this.props.players.slice();
+    players.push("")
+    const playerEntries = players.map((player, index) => {
       return (
         <PlayerEntry
           key={index}
-          id={`inputField${index}`}
           player={player}
-          focus={index === 1}
-          onChange={(value) => this.handleChange(value, index)}
-          onKeyDown={(keyCode) => this.handleKeyDown(keyCode, index)}
-          onBlur={() => this.handleBlur(index)}
+          onChange={(value) => this.props.onChange(this.editPlayers(value, index))}
         >
         </PlayerEntry>
       );
     })
     return (
-      <ol>
+      <ol
+      className="playerInput"
+      >
         {playerEntries}
       </ol>
     );
@@ -156,13 +113,10 @@ class PlayerInput extends React.Component {
 
 class PlayerEntry extends React.Component {
   render () {
-    if (this.props.focus) {
-      console.log("focus");
-      this.focusTextInput();
-    }
+    const className = `playerEntry${this.props.player ? "" : " empty"}`
     return (
       <li
-        className="playerEntry"
+        className={className}
       >
         <input
           id={this.props.id}
@@ -170,8 +124,6 @@ class PlayerEntry extends React.Component {
           value={this.props.player}
           placeholder={"Click to add new player"}
           onChange={(event) => this.props.onChange(event.target.value)}
-          onKeyDown={(event) => this.props.onKeyDown(event.keyCode)}
-          onBlur={() => this.props.onBlur()}
         >
         </input>
       </li>
