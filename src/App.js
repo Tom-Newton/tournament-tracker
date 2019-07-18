@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import $ from 'jquery';
+import PlayerInput from './PlayerInput.js';
 
 class App extends React.Component {
   constructor(props) {
@@ -61,75 +61,6 @@ class App extends React.Component {
 }
 
 export default App;
-
-class PlayerInput extends React.Component {
-  editPlayers (value, index) {
-      const players = this.props.players.slice();
-      console.log(value)
-      console.log(index)
-      if (value) {
-        console.log("update value")
-        players[index] = value;
-      } else {
-        console.log("delete row")
-        players.splice(index, 1)
-      }
-      console.log(players)
-      // if (players[players.length - 1]) {
-      //   players.push("")
-      // }
-      return players;
-  }
-
-  addPlayer (value) {
-    const players = this.props.players.slice();
-    players.push(value);
-    return players;
-  }
-
-  render () {
-    // TODO: Probably shouldn't use index for the key here so rerendering is efficient
-    const players = this.props.players.slice();
-    players.push("")
-    const playerEntries = players.map((player, index) => {
-      return (
-        <PlayerEntry
-          key={index}
-          player={player}
-          onChange={(value) => this.props.onChange(this.editPlayers(value, index))}
-        >
-        </PlayerEntry>
-      );
-    })
-    return (
-      <ol
-      className="playerInput"
-      >
-        {playerEntries}
-      </ol>
-    );
-  }
-}
-
-class PlayerEntry extends React.Component {
-  render () {
-    const className = `playerEntry${this.props.player ? "" : " empty"}`
-    return (
-      <li
-        className={className}
-      >
-        <input
-          id={this.props.id}
-          type="text"
-          value={this.props.player}
-          placeholder={"Click to add new player"}
-          onChange={(event) => this.props.onChange(event.target.value)}
-        >
-        </input>
-      </li>
-    );
-  }
-}
 
 function Tabs(props) {
   const tabList = props.tabs.tabsData.map((tabData, index) => {
