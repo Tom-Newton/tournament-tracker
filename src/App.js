@@ -14,14 +14,22 @@ class App extends React.Component {
               return (
                 <PlayerInput
                   players={this.state.players}
-                  onChange={(players) => this.handleChange(players)}
+                  onChange={(players) => this.handleChange("players", players)}
                 >
                 </PlayerInput>
               );
             }),
           }, {
             tabName: "Game Input",
-            renderTabContent: () => <PlayerInput></PlayerInput>,
+            renderTabContent: () => {
+              return (
+                <GameInput
+                  games={this.state.games}
+                  onChange={(games) => this.handleChange("games", games)}
+                >
+                </GameInput>
+              );
+            },
           }, {
             tabName: "Results Input",
             renderTabContent: () => <PlayerInput></PlayerInput>,
@@ -33,11 +41,25 @@ class App extends React.Component {
         activeTabIndex: 0,
       },
       players: ["player0", "player1"],
+      games: [{
+        gameName: "football"
+      }, {
+        gameName: "water polo"
+      }],
     };
   }
 
-  handleChange(players) {
-    this.setState({players: players});
+  handleChange(area, object) {
+    switch (area) {
+      case "players":
+        this.setState({players: object});
+        break;
+      case "games":
+        this.setState({games: object});
+        break;
+      default:
+        break;
+    }
   }
 
   handleClick(index) {
@@ -61,6 +83,77 @@ class App extends React.Component {
 }
 
 export default App;
+
+class GameInput extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeTabIndex: 0
+    }
+  }
+
+  buildTabs () {
+    const tabsData = this.props.games.map((game) => {
+      return {
+        tabName: game.gameName,
+        renderTabContent: (() => {
+          return (
+            <ConfigureGame
+              game={game}>
+            </ConfigureGame>
+          );
+        }),
+      }
+    });
+    tabsData.push({
+      tabName: "Add New Game",
+      renderTabContent: (() => {
+        return (
+          <div>
+            <input
+              type="text"
+            >
+            </input>
+            <button
+              onClick={() => this.props.onClick()}
+            >
+              Add Game
+            </button>
+          </div>
+        )
+      })
+    })
+    return {
+      tabsData: tabsData,
+      activeTabIndex: this.state.activeTabIndex,
+    }
+  }
+
+  handleClick (index) {
+    this.setState({activeTabIndex: index});
+  }
+
+  render () {
+    return (
+      <Tabs
+        tabs={this.buildTabs(this.props.games)}
+        onClick={(index) => this.handleClick(index)}
+      >
+      </Tabs>
+    );
+  }
+}
+
+class ConfigureGame extends React.Component {
+  render () {
+    return (
+      <div>
+        ConfigureGame
+        {this.props.game.gameName}
+      </div>
+    )
+  }
+}
 
 function Tabs(props) {
   const tabList = props.tabs.tabsData.map((tabData, index) => {
