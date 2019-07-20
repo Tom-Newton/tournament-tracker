@@ -54,7 +54,9 @@ class GameInput extends React.Component {
         if (value) {
           games[index] = {
             gameName: value,
+            // TODO: Switch to using a set instead of an array
             includedPlayers: this.props.players.slice(),
+            teams: [],
           };
         }
         break;
@@ -87,39 +89,121 @@ export default GameInput;
 
 class ConfigureGame extends React.Component {
   render () {
-    const players = this.props.players.slice().map((player, index) => {
-      const included = !!this.props.game.includedPlayers.find((includedPlayer) => {
-        return includedPlayer === player;
-      });
-      return (
-        <li
-          key={index}
-        >
-          <div>
-            {player}
-            <input
-              type="checkbox"
-              onChange={() => this.props.onChange(player)}
-              checked={included}
-            >
-            </input>
-          </div>
-        </li>
-      );
-    })
     return (
       <div>
-      ConfigureGame
-      {this.props.game.gameName}
-        <div className="Included players">
-          <h3>Included Players: </h3>
-          <ol>
-            {players}
-          </ol>
+        ConfigureGame
+        {this.props.game.gameName}
+        <IncludedPlayers
+          players={this.props.players}
+          includedPlayers={this.props.game.includedPlayers}
+          onChange={(player) => this.props.onChange(player)}
+        >
+        </IncludedPlayers>
+        <SetTeams
+          includedPlayers={this.props.game.includedPlayers}
+        >
+        </SetTeams>
+      </div>
+    );
+  }
+}
+
+class SetTeams extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      numberOfTeams: 2,
+      assignedPlayers: [],
+    };
+  }
+
+  handleChange (value) {
+    this.setState({numberOfTeams: value});
+  }
+
+  randomiseTeams (fill) {
+
+    const unassignedPlayers = []
+    this.props.includedPlayers.forEach((player) => {
+      if (!this.state.assignedPlayers.includes(player)) {
+        unassignedPlayers.push(player);
+        // Unassigned players will be asigned to teams so add them to
+        // state.assignedPlayers
+        this.setState((state) => {
+          return {assignedPlayers: state.assignedPlayers.push(player)}
+        });
+      }
+    })
+    console.log(unassignedPlayers);
+    const teams = [];
+    return teams;
+  }
+
+  render () {
+    let fillButton;
+    if (this.state.assignedPlayers.length) {
+      fillButton = (
+        <button
+          onClick={() => this.randomiseTeams(true)}
+        >
+          Fill Teams
+        </button>
+      );
+    }
+    return (
+      <div className="setTeams">
+        <h3>Set Teams: </h3>
+        Number of Teams
+        <input
+          type="number"
+          value={this.state.numberOfTeams}
+          min="2"
+          onChange={(event) => this.handleChange(event.target.value)}
+        >
+        </input>
+        <button
+          onClick={() => this.randomiseTeams(false)}
+        >
+          Randomise Teams
+        </button>
+        {fillButton}
+        <div className="displayTeams">
+          displayTeams
         </div>
       </div>
-    )
+    );
   }
+}
+
+function IncludedPlayers (props) {
+  const includedPlayers = props.players.map((player, index) => {
+    const included = !!props.includedPlayers.find((includedPlayer) => {
+      return includedPlayer === player;
+    });
+    return (
+      <li
+      key={index}
+      >
+        <div>
+          {player}
+          <input
+          type="checkbox"
+          onChange={() => props.onChange(player)}
+          checked={included}
+          >
+          </input>
+        </div>
+      </li>
+    );
+  });
+  return (
+    <div className="includedPlayers">
+      <h3>Included Players: </h3>
+      <ol>
+        {includedPlayers}
+      </ol>
+    </div>
+  );
 }
 
 class NewGame extends React.Component {

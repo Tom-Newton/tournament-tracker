@@ -53,7 +53,6 @@ class App extends React.Component {
   handleChange(area, object) {
     switch (area) {
       case "players":
-        console.log("Change players")
         this.setState({players: object});
         break;
       case "games":
