@@ -49,7 +49,8 @@ class App extends React.Component {
         teams: {
           numberOfTeams: 2,
           teamsData: [],
-        }
+        },
+        gameData: [],
       }],
     };
   }

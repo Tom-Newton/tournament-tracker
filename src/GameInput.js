@@ -69,13 +69,16 @@ export default GameInput;
 
 
 class ConfigureGame extends React.Component {
-  updateGame (includedPlayers, teams) {
+  updateGame (includedPlayers, teams, gameData) {
     const game = this.props.game;
     if (includedPlayers) {
       game.includedPlayers = includedPlayers;
     }
     if (teams) {
       game.teams = teams;
+    }
+    if (gameData) {
+      game.gameData = gameData;
     }
     return game;
   }
@@ -88,33 +91,171 @@ class ConfigureGame extends React.Component {
         <IncludedPlayers
           players={this.props.players}
           includedPlayers={this.props.game.includedPlayers}
-          onChange={(includedPlayers) => this.props.onChange(this.updateGame(includedPlayers, null))}
+          onChange={(includedPlayers) => this.props.onChange(this.updateGame(includedPlayers, null, null))}
         >
         </IncludedPlayers>
         <SetTeams
           includedPlayers={this.props.game.includedPlayers}
-          onChange={(teams) => this.props.onChange(this.updateGame(null, teams))}
           teams={this.props.game.teams}
+          onChange={(teams) => this.props.onChange(this.updateGame(null, teams, null))}
         >
         </SetTeams>
+        <GameData
+          game={this.props.game}
+          onChange={(gameData) => this.props.onChange(this.updateGame(null, null, gameData))}
+        >
+        </GameData>
       </div>
     );
   }
 }
 
-class SetTeams extends React.Component {
+class GameData extends React.Component {
+  updateRound (round, index) {
+    const gameData = this.props.game.gameData.slice();
+    gameData[index] = round;
+    return gameData;
+  }
 
+  addRound () {
+    const gameData = this.props.game.gameData.slice();
+    gameData.push({
+      includedTeams: [],
+      roundData: [],
+    });
+    return gameData;
+  }
+
+  removeRound () {
+    const gameData = this.props.game.gameData.slice();
+    gameData.pop();
+    return gameData;
+  }
+
+  render () {
+    const rounds = this.props.game.gameData.map((round, index) => {
+      return (
+        <Round
+          key={index}
+          round={round}
+          onChange={(round) => this.props.onChange(this.updateRound(round, index))}
+        >
+        </Round>
+      );
+    });
+    return (
+      <div className="gameData">
+        <table>
+          <tbody>
+            {rounds}
+            <tr>
+              <td>
+                <button
+                  onClick={() => this.props.onChange(this.addRound())}
+                >
+                  Add Game Round
+                </button>
+                <button
+                  onClick={() => this.props.onChange(this.removeRound())}
+                >
+                  Remove Game Round
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+}
+
+class Round extends React.Component {
+  updateRound (subRound, index) {
+    const round = this.props.round;
+    const roundData = round.roundData.slice();
+    roundData[index] = subRound;
+    round.roundData = roundData;
+    return round;
+  }
+
+  addRound () {
+    const round = this.props.round;
+    const roundData = round.roundData.slice();
+    roundData.push({
+      includedTeams: [],
+      subRoundData: {
+        type: "",
+        scores: [],
+      },
+    });
+    round.roundData = roundData
+    return round;
+  }
+
+  removeRound () {
+    const round = this.props.round;
+    const roundData = round.roundData.slice();
+    roundData.pop();
+    round.roundData = roundData;
+    return round;
+  }
+
+  render () {
+    const subRounds = this.props.round.roundData.map((subRound, index) => {
+      return (
+        <SubRound
+          key={index}
+          subRound={this.props.subRound}
+          onChange={(subRound) => this.props.onChange(subRound, index)}
+        >
+        </SubRound>
+      );
+    });
+    return (
+      <tr
+      className = "round"
+      >
+        {subRounds}
+        <td>
+          <button
+            onClick={() => this.props.onChange(this.addRound())}
+          >
+            Add Sub Round
+          </button>
+          <button
+            onClick={() => this.props.onChange(this.removeRound())}
+          >
+            Remove Sub Round
+          </button>
+        </td>
+      </tr>
+    );
+  }
+}
+
+class SubRound extends React.Component {
+  render () {
+    return (
+      <td
+        className="subRound"
+      >
+        subround
+      </td>
+    )
+  };
+}
+
+class SetTeams extends React.Component {
   updateNumberOfTeams (value) {
     const teams = this.props.teams;
     teams.numberOfTeams = value;
     return teams;
   }
 
-  updateTeams (fill) {
+  updateTeams () {
     const unassignedPlayers = this.props.includedPlayers.slice();
     const teamsData = [];
     while (unassignedPlayers.length) {
-      // BUG: Fails for more than 2 teams
       let unFilledTeams = Array.from(Array(this.props.teams.numberOfTeams).keys())
       while (unFilledTeams.length && unassignedPlayers.length) {
         const player = unassignedPlayers.pop();
@@ -157,7 +298,7 @@ class SetTeams extends React.Component {
     });
     const randomiseButton = (
       <button
-      onClick={() => this.props.onChange(this.updateTeams(false))}
+      onClick={() => this.props.onChange(this.updateTeams())}
       >
       Randomise Teams
       </button>
@@ -205,24 +346,24 @@ class IncludedPlayers extends React.Component {
         <li
         key={index}
         >
-        <div>
-        {player}
-        <input
-        type="checkbox"
-        onChange={() => this.props.onChange(this.updateIncludedPlayers(player))}
-        checked={included}
-        >
-        </input>
-        </div>
+          <div>
+            {player}
+            <input
+              type="checkbox"
+              onChange={() => this.props.onChange(this.updateIncludedPlayers(player))}
+              checked={included}
+            >
+            </input>
+          </div>
         </li>
       );
     });
     return (
       <div className="includedPlayers">
-      <h3>Included Players: </h3>
-      <ol>
-      {includedPlayers}
-      </ol>
+        <h3>Included Players: </h3>
+        <ol>
+          {includedPlayers}
+        </ol>
       </div>
     );
   }
@@ -245,6 +386,7 @@ class NewGame extends React.Component {
           numberOfTeams: 2,
           teamsData: [],
         },
+        gameData: [],
     };
     return newGame;
   }
