@@ -42,10 +42,14 @@ class App extends React.Component {
         ],
         activeTabIndex: 0,
       },
-      players: ["player0", "player1"],
+      players: ["player0", "player1", "player2"],
       games: [{
         gameName: "gamename",
-        includedPlayers: ["player0", "player1"],
+        includedPlayers: ["player0", "player1", "player2"],
+        teams: {
+          numberOfTeams: 2,
+          teamsData: [],
+        }
       }],
     };
   }
