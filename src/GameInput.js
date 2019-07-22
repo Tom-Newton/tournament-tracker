@@ -1,6 +1,7 @@
 import React from 'react';
 import Tabs from './Tabs.js'
 import './GameInput.css';
+import './App.css';
 
 class GameInput extends React.Component {
   constructor(props) {
@@ -137,6 +138,8 @@ class GameData extends React.Component {
       return (
         <Round
           key={index}
+          roundNumber={index}
+          game={this.props.game}
           round={round}
           onChange={(round) => this.props.onChange(this.updateRound(round, index))}
         >
@@ -149,7 +152,9 @@ class GameData extends React.Component {
           <tbody>
             {rounds}
             <tr>
-              <td>
+              <td
+                colSpan="100%"
+              >
                 <button
                   onClick={() => this.props.onChange(this.addRound())}
                 >
@@ -170,7 +175,7 @@ class GameData extends React.Component {
 }
 
 class Round extends React.Component {
-  updateRound (subRound, index) {
+  updateSubRound (subRound, index) {
     const round = this.props.round;
     const roundData = round.roundData.slice();
     roundData[index] = subRound;
@@ -178,7 +183,7 @@ class Round extends React.Component {
     return round;
   }
 
-  addRound () {
+  addSubRound () {
     const round = this.props.round;
     const roundData = round.roundData.slice();
     roundData.push({
@@ -192,7 +197,7 @@ class Round extends React.Component {
     return round;
   }
 
-  removeRound () {
+  removeSubRound () {
     const round = this.props.round;
     const roundData = round.roundData.slice();
     roundData.pop();
@@ -205,8 +210,10 @@ class Round extends React.Component {
       return (
         <SubRound
           key={index}
-          subRound={this.props.subRound}
-          onChange={(subRound) => this.props.onChange(subRound, index)}
+          subRoundNumber={index}
+          game={this.props.game}
+          subRound={this.props.round.roundData[index]}
+          onChange={(subRound) => this.props.onChange(this.updateSubRound(subRound, index))}
         >
         </SubRound>
       );
@@ -215,15 +222,20 @@ class Round extends React.Component {
       <tr
       className = "round"
       >
+        <td
+          colSpan="100%"
+        >
+          <h5>{`Round: ${this.props.roundNumber}`}</h5>
+        </td>
         {subRounds}
         <td>
           <button
-            onClick={() => this.props.onChange(this.addRound())}
+            onClick={() => this.props.onChange(this.addSubRound())}
           >
             Add Sub Round
           </button>
           <button
-            onClick={() => this.props.onChange(this.removeRound())}
+            onClick={() => this.props.onChange(this.removeSubRound())}
           >
             Remove Sub Round
           </button>
@@ -234,15 +246,115 @@ class Round extends React.Component {
 }
 
 class SubRound extends React.Component {
+  updateTeam (team, index) {
+    const subRound = this.props.subRound;
+    const includedTeams = this.props.subRound.includedTeams.slice();
+    includedTeams[index] = team;
+    subRound.includedTeams = includedTeams;
+    return subRound;
+  }
+
+  addTeam () {
+    const subRound = this.props.subRound;
+    const includedTeams = this.props.subRound.includedTeams.slice()
+    includedTeams.push({
+      sourceType: "score"
+    });
+    subRound.includedTeams = includedTeams;
+    return subRound;
+  }
+
+  removeTeam () {
+    const subRound = this.props.subRound;
+    const includedTeams = this.props.subRound.includedTeams.slice()
+    includedTeams.pop();
+    subRound.includedTeams = includedTeams;
+    return subRound;
+  }
+
   render () {
+    const teamsSelection = this.props.subRound.includedTeams.map((team, index) => {
+      return (
+        <TeamSelection
+          key={index}
+          team={team}
+          game={this.props.game}
+          teamNumber={index}
+          onChange={(team) => this.props.onChange(this.updateTeams(team, index))}
+        >
+        </TeamSelection>
+      );
+    });
     return (
       <td
         className="subRound"
       >
+        <h5>{`Sub Round: ${this.props.subRoundNumber}`}</h5>
+        {teamsSelection}
+        <div
+        key="buttons"
+        >
+          <button
+            onClick={() => this.props.onChange(this.addTeam())}
+          >
+            Add Team
+          </button>
+          <button
+            onClick={() => this.props.onChange(this.removeTeam())}
+          >
+            Remove Team
+          </button>
+        </div>
         subround
       </td>
     )
   };
+}
+
+class TeamSelection extends React.Component {
+  roundSelection () {
+    const rounds = Array(this.props.teams.numberOfTeams).map((value, index) => {
+      console.log(index);
+      return;
+    })
+    return (
+      <select>
+
+      </select>
+    );
+  }
+
+  subRoundSelection () {
+
+  }
+
+  updateTeam (sourceType, round, subRound, getTeamFunction) {
+    const team = this.props.team
+    if (sourceType) {
+      team.sourceType = sourceType
+    }
+    return team;
+  }
+
+  render () {
+    return (
+      <div className="teamSelection">
+        <h5>{`Select Team: ${this.props.teamNumber}`}</h5>
+        Team source type:
+        <select
+          value={this.props.team.sourceType}
+          onChange={(event) => this.onChange(event.target.value)}
+          ref={ref => {
+              this._select = ref
+          }}
+        >
+          <option value="teams">Team List</option>
+          <option value="score">Ranking</option>
+        </select>
+        Team:
+      </div>
+    );
+  }
 }
 
 class SetTeams extends React.Component {
