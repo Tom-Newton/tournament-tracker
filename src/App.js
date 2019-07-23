@@ -40,7 +40,7 @@ class App extends React.Component {
             renderTabContent: () => <div>results table</div>,
           },
         ],
-        activeTabIndex: 0,
+        activeTabIndex: 1,
       },
       players: ["player0", "player1", "player2"],
       games: [{

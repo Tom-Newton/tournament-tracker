@@ -47,7 +47,7 @@ function PlayerEntry (props) {
       <input
         type="text"
         value={props.player}
-        placeholder={"Click to add new player"}
+        placeholder="Click to add new player"
         onChange={(event) => props.onChange(event.target.value)}
       >
       </input>

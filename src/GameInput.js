@@ -121,7 +121,6 @@ class GameData extends React.Component {
   addRound () {
     const gameData = this.props.game.gameData.slice();
     gameData.push({
-      includedTeams: [],
       roundData: [],
     });
     return gameData;
@@ -210,6 +209,7 @@ class Round extends React.Component {
       return (
         <SubRound
           key={index}
+          roundNumber={this.props.roundNumber}
           subRoundNumber={index}
           game={this.props.game}
           subRound={this.props.round.roundData[index]}
@@ -222,10 +222,8 @@ class Round extends React.Component {
       <tr
       className = "round"
       >
-        <td
-          colSpan="100%"
-        >
-          <h5>{`Round: ${this.props.roundNumber}`}</h5>
+        <td>
+          <h5>{`Round: ${this.props.roundNumber + 1}`}</h5>
         </td>
         {subRounds}
         <td>
@@ -246,7 +244,7 @@ class Round extends React.Component {
 }
 
 class SubRound extends React.Component {
-  updateTeam (team, index) {
+  updateTeams (team, index) {
     const subRound = this.props.subRound;
     const includedTeams = this.props.subRound.includedTeams.slice();
     includedTeams[index] = team;
@@ -257,9 +255,7 @@ class SubRound extends React.Component {
   addTeam () {
     const subRound = this.props.subRound;
     const includedTeams = this.props.subRound.includedTeams.slice()
-    includedTeams.push({
-      sourceType: "score"
-    });
+    includedTeams.push({});
     subRound.includedTeams = includedTeams;
     return subRound;
   }
@@ -278,8 +274,9 @@ class SubRound extends React.Component {
         <TeamSelection
           key={index}
           team={team}
+          roundNumber={this.props.roundNumber}
           game={this.props.game}
-          teamNumber={index}
+          teamNumber={index + 1}
           onChange={(team) => this.props.onChange(this.updateTeams(team, index))}
         >
         </TeamSelection>
@@ -289,7 +286,7 @@ class SubRound extends React.Component {
       <td
         className="subRound"
       >
-        <h5>{`Sub Round: ${this.props.subRoundNumber}`}</h5>
+        <h5>{`Sub Round: ${this.props.subRoundNumber + 1}`}</h5>
         {teamsSelection}
         <div
         key="buttons"
@@ -305,53 +302,161 @@ class SubRound extends React.Component {
             Remove Team
           </button>
         </div>
-        subround
       </td>
     )
   };
 }
 
 class TeamSelection extends React.Component {
-  roundSelection () {
-    const rounds = Array(this.props.teams.numberOfTeams).map((value, index) => {
-      console.log(index);
-      return;
-    })
-    return (
-      <select>
-
-      </select>
-    );
-  }
-
-  subRoundSelection () {
-
-  }
-
-  updateTeam (sourceType, round, subRound, getTeamFunction) {
-    const team = this.props.team
+  updateTeam (sourceType, sourceRound, sourceSubRound, number, rank) {
+    // TODO: Change this to a switch statement
+    const team = this.props.team;
     if (sourceType) {
       team.sourceType = sourceType
+    }
+    if (sourceRound || sourceRound === 0) {
+      team.sourceRound = sourceRound;
+    }
+    if (sourceSubRound || sourceSubRound === 0) {
+      team.sourceSubRound = sourceSubRound;
+    }
+    if (number || number === 0) {
+      team.number = number;
+    }
+    if (rank || rank === 0) {
+      team.rank = rank
     }
     return team;
   }
 
+  roundSelection () {
+    const rounds = this.props.game.gameData.slice().splice(0, this.props.roundNumber)
+    const options = rounds.map((round, index) => {
+      return (
+        <option
+          key={index}
+          value={index}
+        >
+          {index + 1}
+        </option>
+      );
+    });
+    return (
+      <div className="roundSelection">
+        Source round:
+        <select
+          value={this.props.team.sourceRound}
+          onChange={(event) => this.props.onChange(this.updateTeam(null, parseInt(event.target.value), null, null, null))}
+        >
+          <option value={undefined}>Select source round</option>
+          {options}
+        </select>
+      </div>
+    );
+  }
+
+  subRoundSelection () {
+    const sourceRound = this.props.team.sourceRound;
+    const options = this.props.game.gameData[sourceRound].roundData.map((subRound, index) => {
+      return (
+        <option
+          key={index}
+          value={index}
+        >
+          {index + 1}
+        </option>
+      );
+    });
+    return (
+      <div className="subRoundSelection">
+      Source sub round:
+        <select
+          value={this.props.team.sourceSubRound}
+          onChange={(event) => this.props.onChange(this.updateTeam(null, null, parseInt(event.target.value), null, null))}
+        >
+          <option value={undefined}>Select source sub round</option>
+          {options}
+        </select>
+      </div>
+    );
+  }
+
+  numberSelection () {
+    const options = Array.from(Array(this.props.game.teams.numberOfTeams).keys()).map((index) => {
+      return (
+        <option
+          key={index}
+          value={index}
+        >
+          {index + 1}
+        </option>
+      );
+    });
+    return(
+      <div className="numberSelection">
+        Number:
+        <select
+          value={this.props.team.number}
+          onChange={(event) => this.props.onChange(this.updateTeam(null, null, null, parseInt(event.target.value), null))}
+        >
+          <option value={undefined}>Select team</option>
+          {options}
+        </select>
+      </div>
+    );
+  }
+
+  rankSelection () {
+    const sourceRound = this.props.team.sourceRound;
+    const sourceSubRound = this.props.team.sourceSubRound;
+    const numberOfRanks = this.props.game.gameData[sourceRound].roundData[sourceSubRound].includedTeams.length;
+    const options = Array.from(Array(numberOfRanks).keys()).map((index) => {
+      return (
+        <option
+          key={index}
+          value={index}
+        >
+          {index + 1}
+        </option>
+      );
+    });
+    return (
+      <div className="rankSelection">
+        Rank:
+        <select
+          value={this.props.team.rank}
+          onChange={(event) => this.props.onChange(this.updateTeam(null, null, null, null, parseInt(event.target.value)))}
+        >
+          <option value={undefined}>Select team</option>
+          {options}
+        </select>
+      </div>
+    );
+  }
+
   render () {
+    const roundSelection = this.props.team.sourceType === "rank";
+    const numberSelection = this.props.team.sourceType === "number";
+    const subRoundSelection = roundSelection && (this.props.team.sourceRound || this.props.team.sourceRound === 0);
+    const rankSelection = subRoundSelection && (this.props.team.sourceSubRound || this.props.team.sourceSubRound === 0);
     return (
       <div className="teamSelection">
-        <h5>{`Select Team: ${this.props.teamNumber}`}</h5>
-        Team source type:
-        <select
-          value={this.props.team.sourceType}
-          onChange={(event) => this.onChange(event.target.value)}
-          ref={ref => {
-              this._select = ref
-          }}
-        >
-          <option value="teams">Team List</option>
-          <option value="score">Ranking</option>
-        </select>
-        Team:
+        <div className="sourceTypeSelection">
+          <h5>{`Select Team: ${this.props.teamNumber}`}</h5>
+          Team source type:
+          <select
+            value={this.props.team.sourceType}
+            onChange={(event) => this.props.onChange(this.updateTeam(event.target.value, null, null, null))}
+          >
+            <option value={undefined}>Select team source type</option>
+            <option value="number">Team List</option>
+            <option value="rank">Ranking</option>
+          </select>
+        </div>
+        {roundSelection && this.roundSelection()}
+        {subRoundSelection && this.subRoundSelection()}
+        {numberSelection && this.numberSelection()}
+        {rankSelection && this.rankSelection()}
       </div>
     );
   }
@@ -401,7 +506,7 @@ class SetTeams extends React.Component {
           className="team"
           key={teamIndex}
         >
-          <h5>{`Team ${teamIndex}:`}</h5>
+          <h5>{`Team ${teamIndex + 1}:`}</h5>
           <ol>
             {team}
           </ol>
