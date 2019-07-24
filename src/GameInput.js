@@ -188,7 +188,7 @@ class Round extends React.Component {
     roundData.push({
       includedTeams: [],
       subRoundData: {
-        type: "",
+        name: "",
         scores: [],
       },
     });
@@ -268,6 +268,18 @@ class SubRound extends React.Component {
     return subRound;
   }
 
+  updateType (type) {
+    const subRound = this.props.subRound;
+    subRound.subRoundData.type = type;
+    return subRound;
+  }
+
+  updateName (name) {
+    const subRound = this.props.subRound;
+    subRound.subRoundData.name = name;
+    return subRound;
+  }
+
   render () {
     const teamsSelection = this.props.subRound.includedTeams.map((team, index) => {
       return (
@@ -287,6 +299,23 @@ class SubRound extends React.Component {
         className="subRound"
       >
         <h5>{`Sub Round: ${this.props.subRoundNumber + 1}`}</h5>
+        Sub round name:
+        <input
+          type="text"
+          value={this.props.subRound.subRoundData.name}
+          placeholder="Enter sub round name"
+          onChange={(event) => this.props.onChange(this.updateName(event.target.value))}
+        >
+        </input>
+        Sub round type:
+        <select
+          value={this.props.subRound.subRoundData.type}
+          onChange={(event) => this.props.onChange(this.updateType(event.target.value))}
+        >
+          <option value={undefined}>Select sub round type</option>
+          <option value="headToHead">Head to head</option>
+          <option value="roundRobin">Round robin</option>
+        </select>
         {teamsSelection}
         <div
         key="buttons"

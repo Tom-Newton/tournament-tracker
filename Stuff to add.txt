@@ -1,8 +1,2 @@
-number of head to head players 
-
-round robin and head to head subround types
-
-subround names 
-
 results input
 results table
