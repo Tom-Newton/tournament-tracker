@@ -1,4 +1,13 @@
-Handle changing names when randomising teams
+Handle changing names and duplicate names
+Make includedPlayers an array of Objects
+{
+playername:
+included:
+playerID:
+}
+playerID is unique 
+Build object from global included players list
+
 
 results input
 results table
