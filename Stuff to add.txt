@@ -1,2 +1,4 @@
+Handle changing names when randomising teams
+
 results input
 results table
