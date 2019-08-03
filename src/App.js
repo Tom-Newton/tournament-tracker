@@ -23,9 +23,10 @@ class App extends React.Component {
         renderTabContent: () => {
           return (
             <GameInput
-            games={this.state.games}
-            players={this.state.players}
-            onChange={(games) => this.handleChange("games", games)}
+              games={this.state.games}
+              players={this.state.players}
+              onChangePlayers={(players) => this.handleChange("players", players)}
+              onChange={(games) => this.handleChange("games", games)}
             >
             </GameInput>
           );
@@ -50,7 +51,7 @@ class App extends React.Component {
     const storedState = JSON.parse(localStorage.getItem("storedState"));
     // Use defaultState unless a state is stored in localstorage
     let state;
-    if (storedState) {
+    if (false) {
       console.log("loaded state")
       state = storedState;
     } else {

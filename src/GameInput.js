@@ -20,6 +20,7 @@ class GameInput extends React.Component {
             <ConfigureGame
               game={game}
               players={this.props.players}
+              onChangePlayers={(players) => this.props.onChangePlayers(players)}
               onChange={(game) => this.props.onChange(this.editGames(game, index))}
             >
             </ConfigureGame>
@@ -32,7 +33,6 @@ class GameInput extends React.Component {
       renderTabContent: (() => {
         return (
           <NewGame
-            players={this.props.players}
             onSubmit={(game) => this.props.onChange(this.editGames(game, this.props.games.length))}
           >
           </NewGame>
@@ -70,10 +70,10 @@ export default GameInput;
 
 
 class ConfigureGame extends React.Component {
-  updateGame (includedPlayers, teams, gameData) {
+  updateGame (gamePlayers, teams, gameData) {
     const game = this.props.game;
-    if (includedPlayers) {
-      game.includedPlayers = includedPlayers;
+    if (gamePlayers) {
+      game.gamePlayers = gamePlayers;
     }
     if (teams) {
       game.teams = teams;
@@ -87,16 +87,16 @@ class ConfigureGame extends React.Component {
   render () {
     return (
       <div>
-        ConfigureGame
-        {this.props.game.gameName}
-        <IncludedPlayers
+        {`Configure game: ${this.props.game.gameName}`}
+        <GamePlayers
           players={this.props.players}
-          includedPlayers={this.props.game.includedPlayers}
-          onChange={(includedPlayers) => this.props.onChange(this.updateGame(includedPlayers, null, null))}
+          gameName={this.props.game.gameName}
+          onChangePlayers={(players) => this.props.onChangePlayers(players)}
         >
-        </IncludedPlayers>
+        </GamePlayers>
         <SetTeams
-          includedPlayers={this.props.game.includedPlayers}
+          players={this.props.players}
+          gameName={this.props.game.gameName}
           teams={this.props.game.teams}
           onChange={(teams) => this.props.onChange(this.updateGame(null, teams, null))}
         >
@@ -499,7 +499,13 @@ class SetTeams extends React.Component {
   }
 
   updateTeams () {
-    const unassignedPlayers = this.props.includedPlayers.slice();
+    const unassignedPlayers = [];
+    this.props.players.forEach((player, index) => {
+      if (!(player.excludedGames.has(this.props.gameName))) {
+        unassignedPlayers.push(player.playerName)
+      }
+    })
+    console.log(unassignedPlayers)
     const teamsData = [];
     while (unassignedPlayers.length) {
       let unFilledTeams = Array.from(Array(this.props.teams.numberOfTeams).keys())
@@ -544,7 +550,7 @@ class SetTeams extends React.Component {
     });
     const randomiseButton = (
       <button
-      onClick={() => this.props.onChange(this.updateTeams())}
+        onClick={() => this.props.onChange(this.updateTeams())}
       >
       Randomise Teams
       </button>
@@ -557,7 +563,7 @@ class SetTeams extends React.Component {
           type="number"
           value={this.props.teams.numberOfTeams}
           min="2"
-          max={this.props.includedPlayers.length}
+          max={this.props.players.length}
           onChange={(event) => this.props.onChange(this.updateNumberOfTeams(parseInt(event.target.value)))}
         >
         </input>
@@ -570,34 +576,29 @@ class SetTeams extends React.Component {
   }
 }
 
-class IncludedPlayers extends React.Component {
-  updateIncludedPlayers (player) {
-    const includedPlayers = this.props.includedPlayers.slice();
-    const includedPlayerIndex = includedPlayers.indexOf(player);
-    if (includedPlayerIndex === -1) {
-      includedPlayers.push(player);
+class GamePlayers extends React.Component {
+  updatePlayers (index) {
+    const players = this.props.players.slice();
+    if (players[index].excludedGames.has(this.props.gameName)) {
+      players[index].excludedGames.delete(this.props.gameName);
     } else {
-      includedPlayers.splice(includedPlayerIndex, 1);
+      players[index].excludedGames.add(this.props.gameName);
     }
-    return includedPlayers
+    return players;
   }
 
   render () {
-    // Fix this so it works when players have the same names
-    const includedPlayers = this.props.players.map((player, index) => {
-      const included = !!this.props.includedPlayers.find((includedPlayer) => {
-        return includedPlayer === player;
-      });
+    const gamePlayers = this.props.players.map((player, index) => {
       return (
         <li
         key={index}
         >
           <div>
-            {player}
+            {player.playerName}
             <input
               type="checkbox"
-              onChange={() => this.props.onChange(this.updateIncludedPlayers(player))}
-              checked={included}
+              onChange={() => this.props.onChangePlayers(this.updatePlayers(index))}
+              checked={!(player.excludedGames.has(this.props.gameName))}
             >
             </input>
           </div>
@@ -605,10 +606,10 @@ class IncludedPlayers extends React.Component {
       );
     });
     return (
-      <div className="includedPlayers">
+      <div className="gamePlayers">
         <h3>Included Players: </h3>
         <ol>
-          {includedPlayers}
+          {gamePlayers}
         </ol>
       </div>
     );
@@ -626,8 +627,6 @@ class NewGame extends React.Component {
   buildNewGame () {
     const newGame = {
         gameName: this.state.gameName,
-        // TODO: Switch to using a set instead of an array
-        includedPlayers: this.props.players.slice(),
         teams: {
           numberOfTeams: 2,
           teamsData: [],

@@ -1,13 +1,20 @@
 Handle changing names and duplicate names
-Make includedPlayers an array of Objects
+Make players an array of Objects
 {
 playername:
 included:
-playerID:
 }
-playerID is unique 
-Build object from global included players list
 
+build players from global players list and previous players list for game
+build at start of render then render from built players
+
+Can't build players while rendering. Build in add players
+
+each player object has name and list of excluded games
+Then add unique game IDs
+
+
+Fix loading old data to handle sets
 
 results input
 results table
