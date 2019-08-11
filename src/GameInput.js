@@ -84,6 +84,53 @@ class ConfigureGame extends React.Component {
     return game;
   }
 
+  buildFixture (subRound) {
+    const fixture = subRound.includedTeams.map((team) => {
+      if (team.sourceType === "number") {
+        return ({
+          team: subRound.includedTeams[team.number],
+          points: null,
+        });
+      } else {
+        return (
+          // TODO: Fill this in after designing score tracking
+          null
+        );
+      }
+    });
+    return fixture;
+  }
+
+  buildFixtures () {
+    const game = this.props.game
+    game.gameData.forEach((round) => {
+      round.roundData.forEach((subRound) => {
+        if (subRound.subRoundData.type === "headToHead") {
+          subRound.subRoundData.fixtures = [this.buildFixture(subRound)];
+        } else {
+          // Round robin subRound format
+          // TODO: Adjust algorithum to give a fair order
+          let fixtures = [];
+          let includedTeams = subRound.includedTeams.slice();
+          while (includedTeams.length) {
+            const currentTeam = includedTeams.pop();
+            includedTeams.forEach((team) => {
+              fixtures.push([{
+                team: currentTeam,
+                points: null,
+              }, {
+                team: team,
+                points: null,
+              }]);
+            });
+          }
+          subRound.subRoundData.fixtures = fixtures;
+        }
+      });
+    });
+    return game;
+  }
+
   render () {
     return (
       <div>
@@ -106,6 +153,11 @@ class ConfigureGame extends React.Component {
           onChange={(gameData) => this.props.onChange(this.updateGame(null, null, gameData))}
         >
         </GameData>
+        <button
+          onClick={() => this.props.onChange(this.buildFixtures())}
+        >
+          Build Fixtures
+        </button>
       </div>
     );
   }
