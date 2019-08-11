@@ -5,7 +5,15 @@ class PlayerInput extends React.Component {
   editPlayers (value, index) {
       const players = this.props.players.slice();
       if (value) {
-        players[index] = value;
+        const player = players[index];
+        if (player) {
+          player.playerName = value;
+        } else {
+          players[index] = {
+            playerName: value,
+            excludedGames: new Set(),
+          }
+        }
       } else {
         players.splice(index, 1)
       }
@@ -15,12 +23,15 @@ class PlayerInput extends React.Component {
   render () {
     // TODO: Probably shouldn't use index for the key here so rerendering is efficient
     const players = this.props.players.slice();
-    players.push("")
+    players.push({
+      playerName: "",
+      excludedGames: new Set(),
+    })
     const playerEntries = players.map((player, index) => {
       return (
         <PlayerEntry
           key={index}
-          player={player}
+          player={player.playerName}
           onChange={(value) => this.props.onChange(this.editPlayers(value, index))}
         >
         </PlayerEntry>

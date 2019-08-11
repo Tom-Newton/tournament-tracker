@@ -1,2 +1,10 @@
-results input
+Then add unique game IDs to allow for deleting games
+
+Fix loading old data to handle sets - change to using a store
+
+
+
+Add displaying fixtures in results input tab
+
+
 results table

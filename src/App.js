@@ -6,54 +6,84 @@ import GameInput from './GameInput.js';
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      tabs: {
-        tabsData: [
-          {
-            tabName: "Player Input",
-            renderTabContent: (() => {
-              return (
-                <PlayerInput
-                  players={this.state.players}
-                  onChange={(players) => this.handleChange("players", players)}
-                >
-                </PlayerInput>
-              );
-            }),
-          }, {
-            tabName: "Game Input",
-            renderTabContent: () => {
-              return (
-                <GameInput
-                  games={this.state.games}
-                  players={this.state.players}
-                  onChange={(games) => this.handleChange("games", games)}
-                >
-                </GameInput>
-              );
-            },
-          }, {
-            tabName: "Results Input",
-            renderTabContent: () => <div>Results input</div>,
-          }, {
-            tabName: "Results Table",
-            renderTabContent: () => <div>results table</div>,
-          },
-        ],
-        activeTabIndex: 1,
-      },
-      players: ["player0", "player1", "player2"],
-      games: [{
-        gameName: "gamename",
-        includedPlayers: ["player0", "player1", "player2"],
-        teams: {
-          numberOfTeams: 2,
-          teamsData: [],
+    const tabsData = [
+      {
+        tabName: "Player Input",
+        renderTabContent: (() => {
+          return (
+            <PlayerInput
+            players={this.state.players}
+            onChange={(players) => this.handleChange("players", players)}
+            >
+            </PlayerInput>
+          );
+        }),
+      }, {
+        tabName: "Game Input",
+        renderTabContent: () => {
+          return (
+            <GameInput
+              games={this.state.games}
+              players={this.state.players}
+              onChangePlayers={(players) => this.handleChange("players", players)}
+              onChange={(games) => this.handleChange("games", games)}
+            >
+            </GameInput>
+          );
         },
-        gameData: [],
-      }],
+      }, {
+        tabName: "Results Input",
+        renderTabContent: () => <div>Results input</div>,
+      }, {
+        tabName: "Results Table",
+        renderTabContent: () => <div>results table</div>,
+      },
+    ]
+
+    const defaultState = {
+      tabs: {
+        activeTabIndex: 0,
+      },
+      players: [],
+      games: [],
     };
+
+    const storedState = JSON.parse(localStorage.getItem("storedState"));
+    // Use defaultState unless a state is stored in localstorage
+    let state;
+    if (storedState) {
+      console.log("loaded state")
+      state = storedState;
+      console.log(state)
+      // Convert excludedGames arrays back to sets
+      const players = state.players.map((player) => {
+        return ({
+          excludedGames: new Set(player.excludedGames),
+          playerName: player.playerName,
+        });
+      });
+      state.players = players;
+    } else {
+      state = defaultState;
+    }
+
+    // Add in tabsData which should never change
+    state.tabs.tabsData = tabsData;
+    this.state = state;
   }
+
+  componentDidUpdate () {
+    // Convert excludedGames sets to arrays so they can be stringified
+    let convertedState = Object.assign({}, this.state);
+    const arrayPlayers = convertedState.players.map((player) => {
+      return ({
+        excludedGames: Array.from(player.excludedGames),
+        playerName: player.playerName,
+      });
+    });
+    convertedState.players = arrayPlayers;
+    localStorage.setItem("storedState", JSON.stringify(convertedState));
+  };
 
   handleChange(area, object) {
     switch (area) {
