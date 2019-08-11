@@ -557,7 +557,6 @@ class SetTeams extends React.Component {
         unassignedPlayers.push(player.playerName)
       }
     })
-    console.log(unassignedPlayers)
     const teamsData = [];
     while (unassignedPlayers.length) {
       let unFilledTeams = Array.from(Array(this.props.teams.numberOfTeams).keys())

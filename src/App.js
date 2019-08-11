@@ -54,7 +54,6 @@ class App extends React.Component {
     if (storedState) {
       console.log("loaded state")
       state = storedState;
-      console.log(state)
       // Convert excludedGames arrays back to sets
       const players = state.players.map((player) => {
         return ({
