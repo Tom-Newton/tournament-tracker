@@ -2,6 +2,7 @@ import React from 'react';
 import Tabs from './Tabs.js';
 import PlayerInput from './PlayerInput.js';
 import GameInput from './GameInput.js';
+import ResultsInput from './ResultsInput.js';
 
 class App extends React.Component {
   constructor(props) {
@@ -33,7 +34,16 @@ class App extends React.Component {
         },
       }, {
         tabName: "Results Input",
-        renderTabContent: () => <div>Results input</div>,
+        renderTabContent: () => {
+          return (
+            <ResultsInput
+              games={this.state.games}
+              players={this.state.players}
+              onChange={(games) => this.handleChange("games", games)}
+            >
+            </ResultsInput>
+          );
+        },
       }, {
         tabName: "Results Table",
         renderTabContent: () => <div>results table</div>,

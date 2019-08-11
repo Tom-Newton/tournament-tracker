@@ -7,8 +7,8 @@ class GameInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeTabIndex: 0
-    }
+      activeTabIndex: 0,
+    };
   }
 
   buildTabs () {
