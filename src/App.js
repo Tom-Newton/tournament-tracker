@@ -51,20 +51,38 @@ class App extends React.Component {
     const storedState = JSON.parse(localStorage.getItem("storedState"));
     // Use defaultState unless a state is stored in localstorage
     let state;
-    if (false) {
+    if (storedState) {
       console.log("loaded state")
       state = storedState;
+      console.log(state)
+      // Convert excludedGames arrays back to sets
+      const players = state.players.map((player) => {
+        return ({
+          excludedGames: new Set(player.excludedGames),
+          playerName: player.playerName,
+        });
+      });
+      state.players = players;
     } else {
       state = defaultState;
     }
 
-    // Add in tabsData which hould never change
+    // Add in tabsData which should never change
     state.tabs.tabsData = tabsData;
     this.state = state;
   }
 
   componentDidUpdate () {
-    localStorage.setItem("storedState", JSON.stringify(this.state));
+    // Convert excludedGames sets to arrays so they can be stringified
+    let convertedState = Object.assign({}, this.state);
+    const arrayPlayers = convertedState.players.map((player) => {
+      return ({
+        excludedGames: Array.from(player.excludedGames),
+        playerName: player.playerName,
+      });
+    });
+    convertedState.players = arrayPlayers;
+    localStorage.setItem("storedState", JSON.stringify(convertedState));
   };
 
   handleChange(area, object) {
