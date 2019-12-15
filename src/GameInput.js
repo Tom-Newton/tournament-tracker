@@ -179,7 +179,6 @@ class Winners extends React.Component {
     if (points) {
       winners[index].points = points;
     }
-    console.log(winners)
     return winners;
   }
 
