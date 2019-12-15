@@ -1,5 +1,7 @@
 import React from 'react';
-import Tabs from './Tabs.js'
+import Tabs from './Tabs.js';
+import TeamSelection from './TeamSelection.js';
+import SetTeams from './SetTeams.js';
 import './GameInput.css';
 import './App.css';
 
@@ -70,10 +72,10 @@ export default GameInput;
 
 
 class ConfigureGame extends React.Component {
-  updateGame (gamePlayers, teams, gameData) {
+  updateGame (winners, teams, gameData) {
     const game = this.props.game;
-    if (gamePlayers) {
-      game.gamePlayers = gamePlayers;
+    if (winners) {
+      game.winners = winners;
     }
     if (teams) {
       game.teams = teams;
@@ -143,9 +145,9 @@ class ConfigureGame extends React.Component {
         </GamePlayers>
         <SetTeams
           players={this.props.players}
-          gameName={this.props.game.gameName}
-          teams={this.props.game.teams}
-          onChange={(teams) => this.props.onChange(this.updateGame(null, teams, null))}
+          game={this.props.game}
+          onChangeTeams={(teams) => this.props.onChange(this.updateGame(null, teams, null))}
+          onChangeWinners={(winners) => this.props.onChange(this.updateGame(winners, null, null))}
         >
         </SetTeams>
         <GameData
@@ -153,6 +155,11 @@ class ConfigureGame extends React.Component {
           onChange={(gameData) => this.props.onChange(this.updateGame(null, null, gameData))}
         >
         </GameData>
+        <Winners
+          game={this.props.game}
+          onChange={(winners) => this.props.onChange(this.updateGame(winners, null, null))}
+        >
+        </Winners>
         <button
           onClick={() => this.props.onChange(this.buildFixtures())}
         >
@@ -160,6 +167,54 @@ class ConfigureGame extends React.Component {
         </button>
       </div>
     );
+  }
+}
+
+class Winners extends React.Component {
+  updateWinners (team, points, index) {
+    const winners = this.props.game.winners;
+    if (team) {
+      winners[index].team = team;
+    }
+    if (points) {
+      winners[index].points = points;
+    }
+    console.log(winners)
+    return winners;
+  }
+
+  render () {
+    const gameWinners = this.props.game.winners.map((winner, index) => {
+      return (
+        <div
+          key={index}
+        >
+          <h5>{`Rank: ${index + 1}`}</h5>
+          <TeamSelection
+            team={winner.team}
+            roundNumber={10}
+            game={this.props.game}
+            teamNumber={index + 1}
+            onChange={(team) => this.props.onChange(this.updateWinners(team, null, index))}
+          >
+          </TeamSelection>
+          Points:
+          <input
+            type="number"
+            value={winner.points}
+            onChange={(event) => this.props.onChange(this.updateWinners(null, event.target.value, index))}
+          >
+          </input>
+        </div>
+      );
+    });
+    
+  
+    return (
+      <div>
+        {gameWinners}
+      </div>
+    )
   }
 }
 
@@ -388,245 +443,6 @@ class SubRound extends React.Component {
   };
 }
 
-class TeamSelection extends React.Component {
-  updateTeam (sourceType, sourceRound, sourceSubRound, number, rank) {
-    // TODO: Change this to a switch statement
-    const team = this.props.team;
-    if (sourceType) {
-      team.sourceType = sourceType
-    }
-    if (sourceRound || sourceRound === 0) {
-      team.sourceRound = sourceRound;
-    }
-    if (sourceSubRound || sourceSubRound === 0) {
-      team.sourceSubRound = sourceSubRound;
-    }
-    if (number || number === 0) {
-      team.number = number;
-    }
-    if (rank || rank === 0) {
-      team.rank = rank
-    }
-    return team;
-  }
-
-  roundSelection () {
-    const rounds = this.props.game.gameData.slice().splice(0, this.props.roundNumber)
-    const options = rounds.map((round, index) => {
-      return (
-        <option
-          key={index}
-          value={index}
-        >
-          {index + 1}
-        </option>
-      );
-    });
-    return (
-      <div className="roundSelection">
-        Source round:
-        <select
-          value={this.props.team.sourceRound}
-          onChange={(event) => this.props.onChange(this.updateTeam(null, parseInt(event.target.value), null, null, null))}
-        >
-          <option value={undefined}>Select source round</option>
-          {options}
-        </select>
-      </div>
-    );
-  }
-
-  subRoundSelection () {
-    const sourceRound = this.props.team.sourceRound;
-    const options = this.props.game.gameData[sourceRound].roundData.map((subRound, index) => {
-      return (
-        <option
-          key={index}
-          value={index}
-        >
-          {index + 1}
-        </option>
-      );
-    });
-    return (
-      <div className="subRoundSelection">
-      Source sub round:
-        <select
-          value={this.props.team.sourceSubRound}
-          onChange={(event) => this.props.onChange(this.updateTeam(null, null, parseInt(event.target.value), null, null))}
-        >
-          <option value={undefined}>Select source sub round</option>
-          {options}
-        </select>
-      </div>
-    );
-  }
-
-  numberSelection () {
-    const options = Array.from(Array(this.props.game.teams.numberOfTeams).keys()).map((index) => {
-      return (
-        <option
-          key={index}
-          value={index}
-        >
-          {index + 1}
-        </option>
-      );
-    });
-    return(
-      <div className="numberSelection">
-        Number:
-        <select
-          value={this.props.team.number}
-          onChange={(event) => this.props.onChange(this.updateTeam(null, null, null, parseInt(event.target.value), null))}
-        >
-          <option value={undefined}>Select team</option>
-          {options}
-        </select>
-      </div>
-    );
-  }
-
-  rankSelection () {
-    const sourceRound = this.props.team.sourceRound;
-    const sourceSubRound = this.props.team.sourceSubRound;
-    const numberOfRanks = this.props.game.gameData[sourceRound].roundData[sourceSubRound].includedTeams.length;
-    const options = Array.from(Array(numberOfRanks).keys()).map((index) => {
-      return (
-        <option
-          key={index}
-          value={index}
-        >
-          {index + 1}
-        </option>
-      );
-    });
-    return (
-      <div className="rankSelection">
-        Rank:
-        <select
-          value={this.props.team.rank}
-          onChange={(event) => this.props.onChange(this.updateTeam(null, null, null, null, parseInt(event.target.value)))}
-        >
-          <option value={undefined}>Select team</option>
-          {options}
-        </select>
-      </div>
-    );
-  }
-
-  render () {
-    const roundSelection = this.props.team.sourceType === "rank";
-    const numberSelection = this.props.team.sourceType === "number";
-    const subRoundSelection = roundSelection && (this.props.team.sourceRound || this.props.team.sourceRound === 0);
-    const rankSelection = subRoundSelection && (this.props.team.sourceSubRound || this.props.team.sourceSubRound === 0);
-    return (
-      <div className="teamSelection">
-        <div className="sourceTypeSelection">
-          <h5>{`Select Team: ${this.props.teamNumber}`}</h5>
-          Team source type:
-          <select
-            value={this.props.team.sourceType}
-            onChange={(event) => this.props.onChange(this.updateTeam(event.target.value, null, null, null))}
-          >
-            <option value={undefined}>Select team source type</option>
-            <option value="number">Team List</option>
-            <option value="rank">Ranking</option>
-          </select>
-        </div>
-        {roundSelection && this.roundSelection()}
-        {subRoundSelection && this.subRoundSelection()}
-        {numberSelection && this.numberSelection()}
-        {rankSelection && this.rankSelection()}
-      </div>
-    );
-  }
-}
-
-class SetTeams extends React.Component {
-  updateNumberOfTeams (value) {
-    const teams = this.props.teams;
-    teams.numberOfTeams = value;
-    return teams;
-  }
-
-  updateTeams () {
-    const unassignedPlayers = [];
-    this.props.players.forEach((player, index) => {
-      if (!(player.excludedGames.has(this.props.gameName))) {
-        unassignedPlayers.push(player.playerName)
-      }
-    })
-    const teamsData = [];
-    while (unassignedPlayers.length) {
-      let unFilledTeams = Array.from(Array(this.props.teams.numberOfTeams).keys())
-      while (unFilledTeams.length && unassignedPlayers.length) {
-        const player = unassignedPlayers.pop();
-        const team = unFilledTeams[Math.floor(Math.random()*unFilledTeams.length)]
-        if (teamsData[team]) {
-          teamsData[team].push(player);
-        } else {
-          teamsData[team] = [player];
-        }
-        unFilledTeams = unFilledTeams.filter((unfilledTeam) => unfilledTeam !== team);
-      }
-    };
-    const teams = this.props.teams;
-    teams.teamsData = teamsData;
-    return teams;
-  }
-
-  render () {
-    const teams = this.props.teams.teamsData.map((teamData, teamIndex) => {
-      const team = teamData.map((player, playerIndex) => {
-        return (
-          <li
-            key={playerIndex}
-          >
-            {player}
-          </li>
-        );
-      })
-      return (
-        <div
-          className="team"
-          key={teamIndex}
-        >
-          <h5>{`Team ${teamIndex + 1}:`}</h5>
-          <ol>
-            {team}
-          </ol>
-        </div>
-      );
-    });
-    const randomiseButton = (
-      <button
-        onClick={() => this.props.onChange(this.updateTeams())}
-      >
-      Randomise Teams
-      </button>
-    );
-    return (
-      <div className="setTeams">
-        <h3>Set Teams: </h3>
-        Number of Teams
-        <input
-          type="number"
-          value={this.props.teams.numberOfTeams}
-          min="2"
-          max={this.props.players.length}
-          onChange={(event) => this.props.onChange(this.updateNumberOfTeams(parseInt(event.target.value)))}
-        >
-        </input>
-        {randomiseButton}
-        <div className="displayTeams">
-          {teams}
-        </div>
-      </div>
-    );
-  }
-}
-
 class GamePlayers extends React.Component {
   updatePlayers (index) {
     const players = this.props.players.slice();
@@ -683,6 +499,10 @@ class NewGame extends React.Component {
           teamsData: [],
         },
         gameData: [],
+        winners: [
+          {points: 0, team: {}}, 
+          {points: 0, team: {}},
+        ],
     };
     return newGame;
   }

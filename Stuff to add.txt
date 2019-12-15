@@ -1,10 +1,11 @@
 Then add unique game IDs to allow for deleting games
-
-Fix loading old data to handle sets - change to using a store
+Add final ranking selection to gameInput 
 
 
 
 Add displaying fixtures in results input tab
+Does display fixtures cause errors when there are no games
 
 
+Design subRound score/leaderboard structure
 results table
