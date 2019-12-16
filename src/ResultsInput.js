@@ -120,13 +120,15 @@ class SubRound extends React.Component {
                 </li>
               );
             })
-          } else {
+          } else if (team.team.sourceType === "rank") {
             // TODO: Implement this after designing subround leaderboard structure
             players = []
+          } else {
+            throw TypeError("team.sourceType is undefined. Catch and use placeholder")
           }
-        } catch {
+        } catch(TypeError) {
           players = (
-            <li>{`Team Number ${team.team.number + 1}`}</li>
+            <li>{`Team Number: ${index + 1}`}</li>
           );
         }
         return (
