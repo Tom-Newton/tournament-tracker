@@ -11,18 +11,18 @@ class ResultsInput extends React.Component {
     };
   }
 
-  buildTabs () {
+  buildTabs() {
     const tabsData = this.props.games.map((game, index) => {
       return {
         tabName: game.gameName,
         renderTabContent: (() => {
           return (
-            <Fixtures
+            <Round
               game={game}
               players={this.props.players}
               onChange={(game) => this.props.onChange(this.editGames(game, index))}
             >
-            </Fixtures>
+            </Round>
           );
         }),
       }
@@ -33,23 +33,38 @@ class ResultsInput extends React.Component {
     }
   }
 
-  handleClick (index) {
-    this.setState({activeTabIndex: index});
+  handleClick(index) {
+    this.setState({ activeTabIndex: index });
   }
 
-  editGames (game, index) {
+  editGames(game, index) {
     const games = this.props.games.slice();
     games[index] = game;
     return games;
   }
 
-  render () {
+  render() {
+    let resultsInput;
+    let tabs = this.buildTabs(this.props.games);
+    if (tabs.tabsData.length === 0) {
+      resultsInput = (
+        <div>
+          <h3>No games have been added. Add a game in the Game Input tab</h3>
+        </div>
+      );
+    } else {
+      resultsInput = (
+        <Tabs
+          tabs={tabs}
+          onClick={(index) => this.handleClick(index)}
+        >
+        </Tabs>
+      );
+    }
     return (
-      <Tabs
-        tabs={this.buildTabs(this.props.games)}
-        onClick={(index) => this.handleClick(index)}
-      >
-      </Tabs>
+      <>
+        {resultsInput}
+      </>
     );
   }
 }
@@ -57,17 +72,19 @@ class ResultsInput extends React.Component {
 export default ResultsInput;
 
 
-class Fixtures extends React.Component {
-  render () {
+class Round extends React.Component {
+  render() {
     const fixtures = this.props.game.gameData.map((round, roundIndex) => {
       const roundFixtures = round.roundData.map((subRound, subRoundIndex) => {
         return (
-          <Fixture
+          <SubRound
             key={subRoundIndex}
+            subRoundIndex={subRoundIndex}
             subRound={subRound}
+            teams={this.props.game.teams}
             onChange={() => console.log("onChange")}
           >
-          </Fixture>
+          </SubRound>
         );
       });
       return (
@@ -81,18 +98,65 @@ class Fixtures extends React.Component {
     });
     return (
       <div>
-        {`Enter results for: ${this.props.game.gameName}`}
         {fixtures}
       </div>
     );
   }
 }
 
-class Fixture extends React.Component {
-  render () {
+class SubRound extends React.Component {
+  render() {
+    const fixtures = this.props.subRound.subRoundData.fixtures.map((fixture, index) => {
+      const teams = fixture.map((team, index) => {
+        let players;
+        try {
+          if (team.team.sourceType === "number") {
+            players = this.props.teams.teamsData[team.team.number].map((player, index) => {
+              return (
+                <li
+                  key={index}
+                >
+                  {player}
+                </li>
+              );
+            })
+          } else {
+            // TODO: Implement this after designing subround leaderboard structure
+            players = []
+          }
+        } catch {
+          players = (
+            <li>{`Team Number ${team.team.number + 1}`}</li>
+          );
+        }
+        return (
+          <div
+            key={index}
+            className="team"
+          >
+            <ul
+              className="teamList"
+            >
+              {players}
+            </ul>
+            <input>
+            </input>
+          </div>
+        );
+      });
+      return (
+        <div
+          key={index}
+          className="fixture"
+        >
+          <h5>{`Sub Round: ${this.props.subRoundIndex + 1} ${this.props.subRound.subRoundData.name}`}</h5>
+          {teams}
+        </div>
+      );
+    })
     return (
       <div>
-        fixture
+        {fixtures}
       </div>
     );
   }

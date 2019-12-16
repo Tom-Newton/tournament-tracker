@@ -9,3 +9,7 @@ Does display fixtures cause errors when there are no games
 
 Design subRound score/leaderboard structure
 results table
+
+
+Fix SetTeams so the max number of teams is the number of included players not 
+the number of players there are in total ???

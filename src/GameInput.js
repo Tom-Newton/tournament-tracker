@@ -13,7 +13,7 @@ class GameInput extends React.Component {
     };
   }
 
-  buildTabs () {
+  buildTabs() {
     const tabsData = this.props.games.map((game, index) => {
       return {
         tabName: game.gameName,
@@ -47,17 +47,17 @@ class GameInput extends React.Component {
     }
   }
 
-  handleClick (index) {
-    this.setState({activeTabIndex: index});
+  handleClick(index) {
+    this.setState({ activeTabIndex: index });
   }
 
-  editGames (game, index) {
+  editGames(game, index) {
     const games = this.props.games.slice();
     games[index] = game;
     return games;
   }
 
-  render () {
+  render() {
     return (
       <Tabs
         tabs={this.buildTabs(this.props.games)}
@@ -72,7 +72,7 @@ export default GameInput;
 
 
 class ConfigureGame extends React.Component {
-  updateGame (winners, teams, gameData) {
+  updateGame(winners, teams, gameData) {
     const game = this.props.game;
     if (winners) {
       game.winners = winners;
@@ -86,30 +86,36 @@ class ConfigureGame extends React.Component {
     return game;
   }
 
-  buildFixture (subRound) {
+  buildFixture(subRound) {
     const fixture = subRound.includedTeams.map((team) => {
       if (team.sourceType === "number") {
         return ({
           team: subRound.includedTeams[team.number],
           points: null,
         });
-      } else {
-        return (
-          // TODO: Fill this in after designing score tracking
-          null
+      } else if (team.sourceType === "rank") {
+        return ({
+          team: {},       // TODO: Fill this in after designing score tracking
+          points: null,
+        }
         );
+      } else {
+        return ({
+          team: {},
+          points: null,
+        });
       }
     });
-    return fixture;
+    return fixture.slice();
   }
 
-  buildFixtures () {
-    const game = this.props.game
+  buildFixtures() {
+    let game = this.props.game
     game.gameData.forEach((round) => {
       round.roundData.forEach((subRound) => {
         if (subRound.subRoundData.type === "headToHead") {
-          subRound.subRoundData.fixtures = [this.buildFixture(subRound)];
-        } else {
+          subRound.subRoundData.fixtures = [this.buildFixture(subRound)].slice();
+        } else if (subRound.subRoundData.type === "roundRobin") {
           // Round robin subRound format
           // TODO: Adjust algorithum to give a fair order
           let fixtures = [];
@@ -126,14 +132,14 @@ class ConfigureGame extends React.Component {
               }]);
             });
           }
-          subRound.subRoundData.fixtures = fixtures;
+          subRound.subRoundData.fixtures = fixtures.slice();
         }
       });
     });
     return game;
   }
 
-  render () {
+  render() {
     return (
       <div>
         {`Configure game: ${this.props.game.gameName}`}
@@ -171,7 +177,7 @@ class ConfigureGame extends React.Component {
 }
 
 class Winners extends React.Component {
-  updateWinners (team, points, index) {
+  updateWinners(team, points, index) {
     const winners = this.props.game.winners;
     if (team) {
       winners[index].team = team;
@@ -182,7 +188,7 @@ class Winners extends React.Component {
     return winners;
   }
 
-  render () {
+  render() {
     const gameWinners = this.props.game.winners.map((winner, index) => {
       return (
         <div
@@ -207,8 +213,8 @@ class Winners extends React.Component {
         </div>
       );
     });
-    
-  
+
+
     return (
       <div>
         {gameWinners}
@@ -218,13 +224,13 @@ class Winners extends React.Component {
 }
 
 class GameData extends React.Component {
-  updateRound (round, index) {
+  updateRound(round, index) {
     const gameData = this.props.game.gameData.slice();
     gameData[index] = round;
     return gameData;
   }
 
-  addRound () {
+  addRound() {
     const gameData = this.props.game.gameData.slice();
     gameData.push({
       roundData: [],
@@ -232,13 +238,13 @@ class GameData extends React.Component {
     return gameData;
   }
 
-  removeRound () {
+  removeRound() {
     const gameData = this.props.game.gameData.slice();
     gameData.pop();
     return gameData;
   }
 
-  render () {
+  render() {
     const rounds = this.props.game.gameData.map((round, index) => {
       return (
         <Round
@@ -280,7 +286,7 @@ class GameData extends React.Component {
 }
 
 class Round extends React.Component {
-  updateSubRound (subRound, index) {
+  updateSubRound(subRound, index) {
     const round = this.props.round;
     const roundData = round.roundData.slice();
     roundData[index] = subRound;
@@ -288,7 +294,7 @@ class Round extends React.Component {
     return round;
   }
 
-  addSubRound () {
+  addSubRound() {
     const round = this.props.round;
     const roundData = round.roundData.slice();
     roundData.push({
@@ -296,13 +302,14 @@ class Round extends React.Component {
       subRoundData: {
         name: "",
         scores: [],
+        fixtures: [],
       },
     });
     round.roundData = roundData
     return round;
   }
 
-  removeSubRound () {
+  removeSubRound() {
     const round = this.props.round;
     const roundData = round.roundData.slice();
     roundData.pop();
@@ -310,7 +317,7 @@ class Round extends React.Component {
     return round;
   }
 
-  render () {
+  render() {
     const subRounds = this.props.round.roundData.map((subRound, index) => {
       return (
         <SubRound
@@ -326,7 +333,7 @@ class Round extends React.Component {
     });
     return (
       <tr
-      className = "round"
+        className="round"
       >
         <td>
           <h5>{`Round: ${this.props.roundNumber + 1}`}</h5>
@@ -350,7 +357,7 @@ class Round extends React.Component {
 }
 
 class SubRound extends React.Component {
-  updateTeams (team, index) {
+  updateTeams(team, index) {
     const subRound = this.props.subRound;
     const includedTeams = this.props.subRound.includedTeams.slice();
     includedTeams[index] = team;
@@ -358,7 +365,7 @@ class SubRound extends React.Component {
     return subRound;
   }
 
-  addTeam () {
+  addTeam() {
     const subRound = this.props.subRound;
     const includedTeams = this.props.subRound.includedTeams.slice()
     includedTeams.push({});
@@ -366,7 +373,7 @@ class SubRound extends React.Component {
     return subRound;
   }
 
-  removeTeam () {
+  removeTeam() {
     const subRound = this.props.subRound;
     const includedTeams = this.props.subRound.includedTeams.slice()
     includedTeams.pop();
@@ -374,19 +381,19 @@ class SubRound extends React.Component {
     return subRound;
   }
 
-  updateType (type) {
+  updateType(type) {
     const subRound = this.props.subRound;
     subRound.subRoundData.type = type;
     return subRound;
   }
 
-  updateName (name) {
+  updateName(name) {
     const subRound = this.props.subRound;
     subRound.subRoundData.name = name;
     return subRound;
   }
 
-  render () {
+  render() {
     const teamsSelection = this.props.subRound.includedTeams.map((team, index) => {
       return (
         <TeamSelection
@@ -424,7 +431,7 @@ class SubRound extends React.Component {
         </select>
         {teamsSelection}
         <div
-        key="buttons"
+          key="buttons"
         >
           <button
             onClick={() => this.props.onChange(this.addTeam())}
@@ -443,7 +450,7 @@ class SubRound extends React.Component {
 }
 
 class GamePlayers extends React.Component {
-  updatePlayers (index) {
+  updatePlayers(index) {
     const players = this.props.players.slice();
     if (players[index].excludedGames.has(this.props.gameName)) {
       players[index].excludedGames.delete(this.props.gameName);
@@ -453,11 +460,11 @@ class GamePlayers extends React.Component {
     return players;
   }
 
-  render () {
+  render() {
     const gamePlayers = this.props.players.map((player, index) => {
       return (
         <li
-        key={index}
+          key={index}
         >
           <div>
             {player.playerName}
@@ -490,33 +497,33 @@ class NewGame extends React.Component {
     }
   }
 
-  buildNewGame () {
+  buildNewGame() {
     const newGame = {
-        gameName: this.state.gameName,
-        teams: {
-          numberOfTeams: 2,
-          teamsData: [],
-        },
-        gameData: [],
-        winners: [
-          {points: 0, team: {}}, 
-          {points: 0, team: {}},
-        ],
+      gameName: this.state.gameName,
+      teams: {
+        numberOfTeams: 2,
+        teamsData: [],
+      },
+      gameData: [],
+      winners: [
+        { points: 0, team: {} },
+        { points: 0, team: {} },
+      ],
     };
     return newGame;
   }
 
-  handleChange (gameName) {
-    this.setState({gameName: gameName});
+  handleChange(gameName) {
+    this.setState({ gameName: gameName });
   }
 
-  handleKeyDown (keyCode) {
+  handleKeyDown(keyCode) {
     if (keyCode === 13) {
       return this.props.onSubmit(this.buildNewGame());
     }
   }
 
-  render () {
+  render() {
     return (
       <div>
         <input

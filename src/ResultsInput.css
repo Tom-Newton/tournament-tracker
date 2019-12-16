@@ -1,0 +1,25 @@
+ul {
+  display: inline-block;
+  list-style-type: none;
+}
+
+.team {
+  display: inline-block;
+}
+
+.fixture {
+  background-color: lightgray;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  display: inline-block;
+  width: 95%;
+}
+
+input {
+  top: 50%;
+}
+
+h5 {
+  margin: 0px;
+}
