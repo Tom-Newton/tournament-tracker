@@ -1,6 +1,8 @@
 ul {
   display: inline-block;
   list-style-type: none;
+  padding: 0px;
+  margin: 0px;
 }
 
 .team {
@@ -14,6 +16,15 @@ ul {
   border-radius: 5px;
   display: inline-block;
   width: 95%;
+}
+
+.fixture {
+  background-color: gray;
+  margin: 5px;
+  padding: 5px;
+  border-radius: 2px;
+  display: inline-block;
+  width: 90%;
 }
 
 input {
