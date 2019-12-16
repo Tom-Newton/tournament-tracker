@@ -126,7 +126,7 @@ class SubRound extends React.Component {
           } else {
             throw TypeError("team.sourceType is undefined. Catch and use placeholder")
           }
-        } catch(TypeError) {
+        } catch (TypeError) {
           players = (
             <li>{`Team Number: ${index + 1}`}</li>
           );
@@ -151,13 +151,15 @@ class SubRound extends React.Component {
           key={index}
           className="fixture"
         >
-          <h5>{`Sub Round: ${this.props.subRoundIndex + 1} ${this.props.subRound.subRoundData.name}`}</h5>
           {teams}
         </div>
       );
     })
     return (
-      <div>
+      <div
+        className="subRound"
+      >
+        <h5>{`Sub Round: ${this.props.subRoundIndex + 1} ${this.props.subRound.subRoundData.name}`}</h5>
         {fixtures}
       </div>
     );
