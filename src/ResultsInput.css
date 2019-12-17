@@ -7,9 +7,10 @@ ul {
 
 .team {
   display: inline-block;
+  margin-right: 30px;
 }
 
-.subRound {
+.subRoundFixtures {
   background-color: lightgray;
   margin: 10px;
   padding: 10px;
@@ -19,7 +20,7 @@ ul {
 }
 
 .fixture {
-  background-color: gray;
+  background-color: white;
   margin: 5px;
   padding: 5px;
   border-radius: 2px;
@@ -28,7 +29,7 @@ ul {
 }
 
 input {
-  top: 50%;
+  width: 60px;
 }
 
 h5 {

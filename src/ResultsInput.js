@@ -73,6 +73,12 @@ export default ResultsInput;
 
 
 class Round extends React.Component {
+  editScore(value, teamIndex, fixtureIndex, subRoundIndex, roundIndex) {
+    const game = this.props.game;
+    game.gameData[roundIndex].roundData[subRoundIndex].subRoundData.fixtures[fixtureIndex][teamIndex].points = value
+    return game
+  }
+
   render() {
     const fixtures = this.props.game.gameData.map((round, roundIndex) => {
       const roundFixtures = round.roundData.map((subRound, subRoundIndex) => {
@@ -82,7 +88,7 @@ class Round extends React.Component {
             subRoundIndex={subRoundIndex}
             subRound={subRound}
             teams={this.props.game.teams}
-            onChange={() => console.log("onChange")}
+            onChange={(value, teamIndex, fixtureIndex) => this.props.onChange(this.editScore(value, teamIndex, fixtureIndex, subRoundIndex, roundIndex))}
           >
           </SubRound>
         );
@@ -106,8 +112,8 @@ class Round extends React.Component {
 
 class SubRound extends React.Component {
   render() {
-    const fixtures = this.props.subRound.subRoundData.fixtures.map((fixture, index) => {
-      const teams = fixture.map((team, index) => {
+    const fixtures = this.props.subRound.subRoundData.fixtures.map((fixture, fixtureIndex) => {
+      const teams = fixture.map((team, teamIndex) => {
         let players;
         try {
           if (team.team.sourceType === "number") {
@@ -128,12 +134,12 @@ class SubRound extends React.Component {
           }
         } catch (TypeError) {
           players = (
-            <li>{`Team Number: ${index + 1}`}</li>
+            <li>{`Team Number: ${teamIndex + 1}`}</li>
           );
         }
         return (
           <div
-            key={index}
+            key={teamIndex}
             className="team"
           >
             <ul
@@ -141,14 +147,18 @@ class SubRound extends React.Component {
             >
               {players}
             </ul>
-            <input>
+            <input
+              type="number"
+              value={team.points}
+              onChange={(event) => this.props.onChange(event.target.value, teamIndex, fixtureIndex)}
+            >
             </input>
           </div>
         );
       });
       return (
         <div
-          key={index}
+          key={fixtureIndex}
           className="fixture"
         >
           {teams}
@@ -157,7 +167,7 @@ class SubRound extends React.Component {
     })
     return (
       <div
-        className="subRound"
+        className="subRoundFixtures"
       >
         <h5>{`Sub Round: ${this.props.subRoundIndex + 1} ${this.props.subRound.subRoundData.name}`}</h5>
         {fixtures}
