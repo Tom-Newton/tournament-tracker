@@ -161,16 +161,16 @@ class ConfigureGame extends React.Component {
           onChange={(gameData) => this.props.onChange(this.updateGame(null, null, gameData))}
         >
         </GameData>
-        <Winners
-          game={this.props.game}
-          onChange={(winners) => this.props.onChange(this.updateGame(winners, null, null))}
-        >
-        </Winners>
         <button
           onClick={() => this.props.onChange(this.buildFixtures())}
         >
           Build Fixtures
         </button>
+        <Winners
+          game={this.props.game}
+          onChange={(winners) => this.props.onChange(this.updateGame(winners, null, null))}
+        >
+        </Winners>
       </div>
     );
   }
@@ -213,10 +213,9 @@ class Winners extends React.Component {
         </div>
       );
     });
-
-
     return (
       <div>
+        <h3>Winners Points: </h3>
         {gameWinners}
       </div>
     )
@@ -259,6 +258,7 @@ class GameData extends React.Component {
     });
     return (
       <div className="gameData">
+        <h3>Tournament Structure:</h3>
         <table>
           <tbody>
             {rounds}
