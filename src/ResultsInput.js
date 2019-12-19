@@ -74,7 +74,7 @@ export default ResultsInput;
 
 class Round extends React.Component {
   getEntry(subRoundData, team) {
-    let entry = subRoundData.leaderboard.find((element) => element.getTeam() === team.getTeam())
+    let entry = subRoundData.leaderboard.find((entry1) => entry1.getTeam() === team.getTeam())
     if (!entry) {
       entry = {
         points: 0,
@@ -105,7 +105,7 @@ class Round extends React.Component {
       entry1.points -= entry1.fixtures[fixtureIndex].points
       entry1.pointDifference -= entry1.fixtures[fixtureIndex].pointDifference
 
-      const pointDifference = eval(teams[0].points) - eval(teams[1].points);
+      const pointDifference = teams[0].points - teams[1].points;
       entry0.pointDifference += pointDifference;
       entry0.fixtures[fixtureIndex].pointDifference = pointDifference;
       entry1.pointDifference -= pointDifference;
@@ -125,7 +125,18 @@ class Round extends React.Component {
         entry1.points += 3;
         entry1.fixtures[fixtureIndex].points = 3;
       }
+    } else if (subRoundData.type === "headToHead") {
+      subRoundData.leaderboard = subRoundData.fixtures[0].slice();
     }
+    subRoundData.leaderboard.sort((entry1, entry2) => {
+      const pointsDifference = entry1.points - entry2.points;
+      if (pointsDifference === 0) {
+        const pointsDifferenceDifference = entry1.pointsDifference - entry2.pointsDifference;
+        return -pointsDifferenceDifference;
+      } else {
+        return -pointsDifference;
+      }
+    });
     return game
   }
 
@@ -163,6 +174,7 @@ class Round extends React.Component {
 class SubRound extends React.Component {
   render() {
     const fixtures = this.props.subRound.subRoundData.fixtures.map((fixture, fixtureIndex) => {
+      console.log(fixture)
       const teams = fixture.map((fixtureTeam, teamIndex) => {
         const team = fixtureTeam.getTeam();
         let players;
@@ -201,7 +213,7 @@ class SubRound extends React.Component {
             <input
               type="number"
               value={fixtureTeam.points}
-              onChange={(event) => this.props.onChange(event.target.value, teamIndex, fixtureIndex)}
+              onChange={(event) => this.props.onChange(parseInt(event.target.value), teamIndex, fixtureIndex)}
             >
             </input>
           </div>

@@ -113,7 +113,9 @@ class ConfigureGame extends React.Component {
     game.gameData.forEach((round) => {
       round.roundData.forEach((subRound) => {
         if (subRound.subRoundData.type === "headToHead") {
-          subRound.subRoundData.fixtures = subRound.includedTeams.map((team) => this.getFixtureTeam(team));
+          if (subRound.includedTeams.length >= 2) {
+            subRound.subRoundData.fixtures = [subRound.includedTeams.map((team) => this.getFixtureTeam(team))];
+          }
         } else if (subRound.subRoundData.type === "roundRobin") {
           let fixtures = [];
           let includedTeams = subRound.includedTeams.slice();
