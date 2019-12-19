@@ -61,7 +61,7 @@ class App extends React.Component {
     const storedState = JSON.parse(localStorage.getItem("storedState"));
     // Use defaultState unless a state is stored in localstorage
     let state;
-    if (storedState) {
+    if (false) { // (storedState) {
       console.log("loaded state")
       state = storedState;
       // Convert excludedGames arrays back to sets
@@ -72,6 +72,8 @@ class App extends React.Component {
         });
       });
       state.players = players;
+      // Convert getTeam() strings back to functions
+      console.log(state.games[0].gameData[0].roundData[0].subRoundData[0])
     } else {
       state = defaultState;
     }
@@ -91,6 +93,28 @@ class App extends React.Component {
       });
     });
     convertedState.players = arrayPlayers;
+    // const stringGetTeams = convertedState.games.map((game) => {
+    //   return (
+    //     game.gameData.map((round) => {
+    //       return (
+    //         round.roundData.map((subRound) => {
+    //           return (
+    //             subRound.subRoundData.fixtures.map((teams) => {
+    //               return (
+    //                 teams.map((team) => {
+    //                   return (
+    //                     team.getTeam = String(team.getTeam)
+    //                   );
+    //                 })
+    //               );
+    //             })
+    //           );
+    //         })
+    //       );
+    //     })
+    //   );
+    // })
+    // convertedState.game = stringGetTeams;
     localStorage.setItem("storedState", JSON.stringify(convertedState));
   };
 

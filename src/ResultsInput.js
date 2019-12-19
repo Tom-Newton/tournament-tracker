@@ -73,9 +73,59 @@ export default ResultsInput;
 
 
 class Round extends React.Component {
+  getEntry(subRoundData, team) {
+    let entry = subRoundData.leaderboard.find((element) => element.getTeam() === team.getTeam())
+    if (!entry) {
+      entry = {
+        points: 0,
+        pointDifference: 0,
+        fixtures: subRoundData.fixtures.map(() => {
+          return { points: 0, pointDifference: 0 }
+        }),
+        getTeam: team.getTeam,
+      };
+      subRoundData.leaderboard.push(entry);
+    }
+    return entry;
+  }
+
   editScore(value, teamIndex, fixtureIndex, subRoundIndex, roundIndex) {
-    const game = this.props.game;
-    game.gameData[roundIndex].roundData[subRoundIndex].subRoundData.fixtures[fixtureIndex][teamIndex].points = value
+    const game = this.props.game
+    const subRoundData = game.gameData[roundIndex].roundData[subRoundIndex].subRoundData;
+    const teams = subRoundData.fixtures[fixtureIndex]
+
+    teams[teamIndex].points = value;
+
+    if (subRoundData.type === "roundRobin") {
+      const entry0 = this.getEntry(subRoundData, teams[0]);
+      const entry1 = this.getEntry(subRoundData, teams[1]);
+
+      entry0.points -= entry0.fixtures[fixtureIndex].points
+      entry0.pointDifference -= entry0.fixtures[fixtureIndex].pointDifference
+      entry1.points -= entry1.fixtures[fixtureIndex].points
+      entry1.pointDifference -= entry1.fixtures[fixtureIndex].pointDifference
+
+      const pointDifference = eval(teams[0].points) - eval(teams[1].points);
+      entry0.pointDifference += pointDifference;
+      entry0.fixtures[fixtureIndex].pointDifference = pointDifference;
+      entry1.pointDifference -= pointDifference;
+      entry1.fixtures[fixtureIndex].pointDifference = -pointDifference;
+
+      if (pointDifference > 0) {
+        entry0.points += 3;
+        entry0.fixtures[fixtureIndex].points = 3;
+        entry1.fixtures[fixtureIndex].points = 0;
+      } else if (pointDifference === 0) {
+        entry0.points += 1;
+        entry0.fixtures[fixtureIndex].points = 1;
+        entry1.points += 1;
+        entry1.fixtures[fixtureIndex].points = 1;
+      } else {
+        entry0.fixtures[fixtureIndex].points = 0;
+        entry1.points += 3;
+        entry1.fixtures[fixtureIndex].points = 3;
+      }
+    }
     return game
   }
 
@@ -113,11 +163,12 @@ class Round extends React.Component {
 class SubRound extends React.Component {
   render() {
     const fixtures = this.props.subRound.subRoundData.fixtures.map((fixture, fixtureIndex) => {
-      const teams = fixture.map((team, teamIndex) => {
+      const teams = fixture.map((fixtureTeam, teamIndex) => {
+        const team = fixtureTeam.getTeam();
         let players;
         try {
-          if (team.team.sourceType === "number") {
-            players = this.props.teams.teamsData[team.team.number].map((player, index) => {
+          if (team.sourceType === "number") {
+            players = this.props.teams.teamsData[team.number].map((player, index) => {
               return (
                 <li
                   key={index}
@@ -126,7 +177,7 @@ class SubRound extends React.Component {
                 </li>
               );
             })
-          } else if (team.team.sourceType === "rank") {
+          } else if (team.sourceType === "rank") {
             // TODO: Implement this after designing subround leaderboard structure
             players = []
           } else {
@@ -134,7 +185,7 @@ class SubRound extends React.Component {
           }
         } catch (TypeError) {
           players = (
-            <li>{`Team Number: ${teamIndex + 1}`}</li>
+            <li>{`Team: ${teamIndex + 1}`}</li>
           );
         }
         return (
@@ -149,7 +200,7 @@ class SubRound extends React.Component {
             </ul>
             <input
               type="number"
-              value={team.points}
+              value={fixtureTeam.points}
               onChange={(event) => this.props.onChange(event.target.value, teamIndex, fixtureIndex)}
             >
             </input>

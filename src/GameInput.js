@@ -86,27 +86,26 @@ class ConfigureGame extends React.Component {
     return game;
   }
 
-  buildFixture(subRound) {
-    const fixture = subRound.includedTeams.map((team) => {
-      if (team.sourceType === "number") {
-        return ({
-          team: subRound.includedTeams[team.number],
-          points: null,
-        });
-      } else if (team.sourceType === "rank") {
-        return ({
-          team: {},       // TODO: Fill this in after designing score tracking
-          points: null,
-        }
-        );
-      } else {
-        return ({
-          team: {},
-          points: null,
-        });
-      }
-    });
-    return fixture.slice();
+  getFixtureTeam(team) {
+    if (team.sourceType === "number") {
+      return({
+        getTeam: () => team,
+        points: 0,
+      }) 
+    }
+    else if (team.sourceType === "rank") {
+      return ({
+        getTeam: () => this.props.game.gameData[team.sourceRound].roundData[team.sourceSubRound].subRoundData.leaderboard[team.rank].getTeam,
+        points: 0,
+      });
+    } else {
+      const message = `buildFixture team had no sourceType team = ${team}`
+      console.warn(message)
+      return ({
+        getTeam: () => message,
+        points: 0,
+      });
+    }
   }
 
   buildFixtures() {
@@ -114,26 +113,19 @@ class ConfigureGame extends React.Component {
     game.gameData.forEach((round) => {
       round.roundData.forEach((subRound) => {
         if (subRound.subRoundData.type === "headToHead") {
-          subRound.subRoundData.fixtures = [this.buildFixture(subRound)].slice();
+          subRound.subRoundData.fixtures = subRound.includedTeams.map((team) => this.getFixtureTeam(team));
         } else if (subRound.subRoundData.type === "roundRobin") {
-          // Round robin subRound format
-          // TODO: Adjust algorithum to give a fair order
           let fixtures = [];
           let includedTeams = subRound.includedTeams.slice();
           while (includedTeams.length) {
             const currentTeam = includedTeams.pop();
             includedTeams.forEach((team) => {
-              fixtures.push([{
-                team: currentTeam,
-                points: null,
-              }, {
-                team: team,
-                points: null,
-              }]);
+              fixtures.push([this.getFixtureTeam(currentTeam), this.getFixtureTeam(team)]);
             });
           }
           subRound.subRoundData.fixtures = fixtures.slice();
         }
+        subRound.subRoundData.leaderboard = []
       });
     });
     return game;
@@ -301,7 +293,7 @@ class Round extends React.Component {
       includedTeams: [],
       subRoundData: {
         name: "",
-        scores: [],
+        leaderboard: [],
         fixtures: [],
       },
     });
