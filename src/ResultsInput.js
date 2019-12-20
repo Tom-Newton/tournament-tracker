@@ -74,7 +74,7 @@ export default ResultsInput;
 
 class Round extends React.Component {
   getEntry(subRoundData, team) {
-    return subRoundData.leaderboard.find((entry1) => entry1.getTeam === team.getTeam);
+    return subRoundData.leaderboard.find((entry) => entry.getTeam === team.getTeam);
   }
 
   editScore(value, teamIndex, fixtureIndex, subRoundIndex, roundIndex) {
@@ -163,10 +163,8 @@ class Round extends React.Component {
 class SubRound extends React.Component {
   render() {
     const fixtures = this.props.subRound.subRoundData.fixtures.map((fixture, fixtureIndex) => {
-      console.log(fixture)
       const teams = fixture.map((fixtureTeam, teamIndex) => {
         const team = fixtureTeam.getTeam();
-        console.log(team)
         let players;
         try {
           players = this.props.teams.teamsData[team.number].map((player, index) => {

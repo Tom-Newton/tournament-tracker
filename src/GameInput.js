@@ -203,6 +203,7 @@ class Winners extends React.Component {
           key={index}
         >
           <h5>{`Rank: ${index + 1}`}</h5>
+          {/* TODO: Find a better way to allow any round number rather than just setting to 10 */}
           <TeamSelection
             team={winner.team}
             roundNumber={10}
@@ -215,7 +216,7 @@ class Winners extends React.Component {
           <input
             type="number"
             value={winner.points}
-            onChange={(event) => this.props.onChange(this.updateWinners(null, event.target.value, index))}
+            onChange={(event) => this.props.onChange(this.updateWinners(null, parseInt(event.target.value), index))}
           >
           </input>
         </div>

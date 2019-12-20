@@ -3,6 +3,7 @@ import Tabs from './Tabs.js';
 import PlayerInput from './PlayerInput.js';
 import GameInput from './GameInput.js';
 import ResultsInput from './ResultsInput.js';
+import ResultsTable from './ResultsTable.js';
 
 class App extends React.Component {
   constructor(props) {
@@ -46,7 +47,15 @@ class App extends React.Component {
         },
       }, {
         tabName: "Results Table",
-        renderTabContent: () => <div>results table</div>,
+        renderTabContent: () => {
+          return (
+            <ResultsTable
+              games={this.state.games}
+              players={this.state.players}
+            >
+            </ResultsTable>
+          );
+        },
       },
     ]
 

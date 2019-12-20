@@ -5,8 +5,7 @@ the number of players there are in total ???
 
 Fix saving the state 
 
+Add robustsness for identical player names
+Change game.teams.teamData to contain getPlayer functions 
+
 results table
-Where to put the update function:
-in render
-call it when winners or leaderboard changes
-Button to update
