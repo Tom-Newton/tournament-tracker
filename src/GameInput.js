@@ -86,48 +86,62 @@ class ConfigureGame extends React.Component {
     return game;
   }
 
-  getFixtureTeam(team) {
+  getGetTeam(team) {
     if (team.sourceType === "number") {
-      return({
-        getTeam: () => team,
-        points: 0,
-      }) 
+      return () => team
     }
     else if (team.sourceType === "rank") {
-      return ({
-        getTeam: () => this.props.game.gameData[team.sourceRound].roundData[team.sourceSubRound].subRoundData.leaderboard[team.rank].getTeam,
-        points: 0,
-      });
+      return () => this.props.game.gameData[team.sourceRound].roundData[team.sourceSubRound].subRoundData.leaderboard[team.rank].getTeam();
     } else {
       const message = `buildFixture team had no sourceType team = ${team}`
       console.warn(message)
-      return ({
-        getTeam: () => message,
-        points: 0,
-      });
+      return () => message;
     }
+  }
+
+  buildFixture(teams) {
+    return teams.map(getTeam => {
+      return ({
+        getTeam: getTeam,
+        points: ""
+      });
+    });
   }
 
   buildFixtures() {
     let game = this.props.game
     game.gameData.forEach((round) => {
       round.roundData.forEach((subRound) => {
-        if (subRound.subRoundData.type === "headToHead") {
-          if (subRound.includedTeams.length >= 2) {
-            subRound.subRoundData.fixtures = [subRound.includedTeams.map((team) => this.getFixtureTeam(team))];
-          }
-        } else if (subRound.subRoundData.type === "roundRobin") {
-          let fixtures = [];
-          let includedTeams = subRound.includedTeams.slice();
-          while (includedTeams.length) {
-            const currentTeam = includedTeams.pop();
-            includedTeams.forEach((team) => {
-              fixtures.push([this.getFixtureTeam(currentTeam), this.getFixtureTeam(team)]);
+        const subRoundData = subRound.subRoundData
+        let includedTeams = subRound.includedTeams.map(team => this.getGetTeam(team));
+        if (subRoundData.type === "headToHead") {
+          if (includedTeams.length >= 2) {
+            subRoundData.fixtures = [this.buildFixture(includedTeams)];
+            subRoundData.leaderboard = includedTeams.map(getTeam => {
+              return {getTeam: getTeam}
             });
           }
-          subRound.subRoundData.fixtures = fixtures.slice();
+        } else if (subRoundData.type === "roundRobin") {
+          let fixtures = [];
+          let includedTeamsCopy = includedTeams.slice();
+          while (includedTeamsCopy.length) {
+            const currentTeam = includedTeamsCopy.pop();
+            includedTeamsCopy.forEach((team) => {
+              fixtures.push(this.buildFixture([currentTeam, team]));
+            });
+          }
+          subRoundData.fixtures = fixtures.slice();
+          subRoundData.leaderboard = includedTeams.map(getTeam => {
+            return ({
+              points: 0,
+              pointDifference: 0,
+              fixtures: subRoundData.fixtures.map(() => {
+                return { points: 0, pointDifference: 0 }
+              }),
+              getTeam: getTeam,
+            });
+          });
         }
-        subRound.subRoundData.leaderboard = []
       });
     });
     return game;

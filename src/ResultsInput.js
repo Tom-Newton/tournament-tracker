@@ -74,19 +74,7 @@ export default ResultsInput;
 
 class Round extends React.Component {
   getEntry(subRoundData, team) {
-    let entry = subRoundData.leaderboard.find((entry1) => entry1.getTeam() === team.getTeam())
-    if (!entry) {
-      entry = {
-        points: 0,
-        pointDifference: 0,
-        fixtures: subRoundData.fixtures.map(() => {
-          return { points: 0, pointDifference: 0 }
-        }),
-        getTeam: team.getTeam,
-      };
-      subRoundData.leaderboard.push(entry);
-    }
-    return entry;
+    return subRoundData.leaderboard.find((entry1) => entry1.getTeam === team.getTeam);
   }
 
   editScore(value, teamIndex, fixtureIndex, subRoundIndex, roundIndex) {
@@ -96,6 +84,7 @@ class Round extends React.Component {
 
     teams[teamIndex].points = value;
 
+    // Update subRound leaderboard
     if (subRoundData.type === "roundRobin") {
       const entry0 = this.getEntry(subRoundData, teams[0]);
       const entry1 = this.getEntry(subRoundData, teams[1]);
@@ -177,24 +166,18 @@ class SubRound extends React.Component {
       console.log(fixture)
       const teams = fixture.map((fixtureTeam, teamIndex) => {
         const team = fixtureTeam.getTeam();
+        console.log(team)
         let players;
         try {
-          if (team.sourceType === "number") {
-            players = this.props.teams.teamsData[team.number].map((player, index) => {
-              return (
-                <li
-                  key={index}
-                >
-                  {player}
-                </li>
-              );
-            })
-          } else if (team.sourceType === "rank") {
-            // TODO: Implement this after designing subround leaderboard structure
-            players = []
-          } else {
-            throw TypeError("team.sourceType is undefined. Catch and use placeholder")
-          }
+          players = this.props.teams.teamsData[team.number].map((player, index) => {
+            return (
+              <li
+                key={index}
+              >
+                {player}
+              </li>
+            );
+          })
         } catch (TypeError) {
           players = (
             <li>{`Team: ${teamIndex + 1}`}</li>

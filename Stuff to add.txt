@@ -1,18 +1,12 @@
 Then add unique game IDs to allow for deleting games
-Add final ranking selection to gameInput 
-
-
-
-Add displaying fixtures in results input tab
-Does display fixtures cause errors when there are no games
-
-
-results table
-
 
 Fix SetTeams so the max number of teams is the number of included players not 
 the number of players there are in total ???
 
-Fix saving the data 
+Fix saving the state 
 
-Finish subRound score/leaderboard structure
+results table
+Where to put the update function:
+in render
+call it when winners or leaderboard changes
+Button to update
