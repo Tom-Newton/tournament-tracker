@@ -25,7 +25,6 @@ class ResultsTable extends React.Component {
       });
     });
     leaderboard.sort((entry1, entry2) => entry2.points - entry1.points);
-    console.log(leaderboard);
     return leaderboard;
   }
   render() {
@@ -40,13 +39,21 @@ class ResultsTable extends React.Component {
         </tr>
       );
     });
-    return (
-      <table>
-        <tbody>
-          {leaderboard}
-        </tbody>
-      </table>
-    );
+    if (leaderboard.length > 0) {
+      return (
+        <table>
+          <tbody>
+            {leaderboard}
+          </tbody>
+        </table>
+      );
+    } else {
+      return (
+        <div>
+          <h3>No players have been added. Add some players in the Player Input tab</h3>
+        </div>
+      )
+    }
   }
 }
 
