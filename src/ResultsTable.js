@@ -12,20 +12,16 @@ class ResultsTable extends React.Component {
     this.props.games.forEach(game => {
       game.winners.forEach(winner => {
         let team = winner.team;
-        console.log(team)
-        console.log(game.teams)
-        if (team.sourceType) {
+        try {
           if (team.sourceType === "rank") {
             team = game.gameData[team.sourceRound].roundData[team.sourceSubRound].subRoundData.leaderboard[team.rank].getTeam()
           }
           const teamMembers = game.teams.teamsData[team.number]
-          if (teamMembers) {
-            teamMembers.forEach(playerName => {
-              const entry = leaderboard.find(entry1 => entry1.playerName === playerName)
-              entry.points += winner.points;
-            });
-          }
-        }
+          teamMembers.forEach(playerName => {
+            const entry = leaderboard.find(entry1 => entry1.playerName === playerName)
+            entry.points += winner.points;
+          });
+        } catch(TypeError) {}
       });
     });
     leaderboard.sort((entry1, entry2) => entry2.points - entry1.points);
@@ -33,9 +29,23 @@ class ResultsTable extends React.Component {
     return leaderboard;
   }
   render() {
-    const leaderboard = this.buildLeaderboard();
+    const leaderboard = this.buildLeaderboard().map((entry, index) => {
+      return (
+        <tr
+          key={index}
+        >
+          <td>{index}</td>
+          <td>{entry.playerName}</td>
+          <td>{entry.points}</td>
+        </tr>
+      );
+    });
     return (
-      <div>empty</div>
+      <table>
+        <tbody>
+          {leaderboard}
+        </tbody>
+      </table>
     );
   }
 }
