@@ -9,7 +9,10 @@ class SetTeams extends React.Component {
       if (numberOfWinnersError > 0) {
         this.props.onChangeWinners(this.props.game.winners.slice(0, value))
       } else if (numberOfWinnersError < 0) {
-        this.props.onChangeWinners(this.props.game.winners.concat(Array(-numberOfWinnersError).fill({points: 0, team: {}})))
+        let winners = this.props.game.winners
+        for (let i = 0; i < -numberOfWinnersError; i++) {
+          winners.push({points: 0, team: {}})
+        }
       }
       return teams;
     }

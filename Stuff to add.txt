@@ -7,5 +7,3 @@ Fix saving the state
 
 Add robustsness for identical player names
 Change game.teams.teamData to contain getPlayer functions 
-
-results table
