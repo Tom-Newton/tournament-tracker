@@ -191,7 +191,8 @@ class Winners extends React.Component {
       winners[index].team = team;
     }
     if (points) {
-      winners[index].points = points;
+      console.log(points)
+      winners[index].points = parseInt(points);
     }
     return winners;
   }
@@ -216,7 +217,7 @@ class Winners extends React.Component {
           <input
             type="number"
             value={winner.points}
-            onChange={(event) => this.props.onChange(this.updateWinners(null, parseInt(event.target.value), index))}
+            onChange={(event) => this.props.onChange(this.updateWinners(null, event.target.value, index))}
           >
           </input>
         </div>
