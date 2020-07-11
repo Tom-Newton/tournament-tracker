@@ -1,6 +1,6 @@
 import React from "react";
 // import { loadFile, writeFile } from "fs";
-let fs = require ("fs");
+let fs = require("fs");
 
 class SaveLoad extends React.Component {
   editSaveLoad(savePath, loadPath) {
@@ -31,7 +31,7 @@ class SaveLoad extends React.Component {
                 localStorage.getItem("storedState"),
                 function (err) {
                   if (err) throw err;
-                  console.log('Replaced!');
+                  console.log("Replaced!");
                 }
               )
             }

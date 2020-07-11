@@ -82,7 +82,7 @@ class App extends React.Component {
       saveLoad: {
         save: "",
         load: "",
-      }
+      },
     };
 
     const restoredState = JSON.parse(

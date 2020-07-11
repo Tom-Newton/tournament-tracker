@@ -1,27 +1,29 @@
-import React from 'react';
+import React from "react";
 import getTeam from "./getTeam.js";
-import './ResultsTable.css';
+import "./ResultsTable.css";
 
 class ResultsTable extends React.Component {
   buildLeaderboard() {
-    let leaderboard = this.props.players.map(player => {
-      return ({
+    let leaderboard = this.props.players.map((player) => {
+      return {
         playerName: player.playerName,
         gamePoints: {},
         points: 0,
-      });
+      };
     });
-    this.props.games.forEach(game => {
-      game.winners.forEach(winner => {
+    this.props.games.forEach((game) => {
+      game.winners.forEach((winner) => {
         let team = getTeam(winner.team, game.gameData);
         try {
-          const teamMembers = game.teams.teamsData[team.number]
-          teamMembers.forEach(playerName => {
-            const entry = leaderboard.find(entry1 => entry1.playerName === playerName)
+          const teamMembers = game.teams.teamsData[team.number];
+          teamMembers.forEach((playerName) => {
+            const entry = leaderboard.find(
+              (entry1) => entry1.playerName === playerName
+            );
             entry.gamePoints[game.gameName] = winner.points;
             entry.points += winner.points;
           });
-        } catch(TypeError) {}
+        } catch (TypeError) {}
       });
     });
     leaderboard.sort((entry1, entry2) => entry2.points - entry1.points);
@@ -30,14 +32,10 @@ class ResultsTable extends React.Component {
   render() {
     const leaderboard = this.buildLeaderboard().map((entry, index) => {
       const gamePoints = this.props.games.map((game, index) => {
-        return (
-          <td key={index}>{entry.gamePoints[game.gameName]}</td>
-        );
+        return <td key={index}>{entry.gamePoints[game.gameName]}</td>;
       });
       return (
-        <tr
-          key={index}
-        >
+        <tr key={index}>
           <td>{index + 1}</td>
           <td>{entry.playerName}</td>
           {gamePoints}
@@ -46,9 +44,7 @@ class ResultsTable extends React.Component {
       );
     });
     const gameNames = this.props.games.map((game, index) => {
-      return (
-        <th key={index}>{game.gameName}</th>
-      );
+      return <th key={index}>{game.gameName}</th>;
     });
     if (leaderboard.length > 0) {
       return (
@@ -67,9 +63,11 @@ class ResultsTable extends React.Component {
     } else {
       return (
         <div>
-          <h3>No players have been added. Add some players in the Player Input tab</h3>
+          <h3>
+            No players have been added. Add some players in the Player Input tab
+          </h3>
         </div>
-      )
+      );
     }
   }
 }

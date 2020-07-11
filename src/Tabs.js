@@ -1,5 +1,5 @@
-import React from 'react';
-import './Tabs.css'
+import React from "react";
+import "./Tabs.css";
 
 function Tabs(props) {
   const tabList = props.tabs.tabsData.map((tabData, index) => {
@@ -9,22 +9,19 @@ function Tabs(props) {
         tabName={tabData.tabName}
         active={index === props.tabs.activeTabIndex}
         onClick={() => props.onClick(index)}
-      >
-      </Tab>
+      ></Tab>
     );
   });
 
-  const currentTabContent = props.tabs.tabsData[props.tabs.activeTabIndex].renderTabContent()
+  const currentTabContent = props.tabs.tabsData[
+    props.tabs.activeTabIndex
+  ].renderTabContent();
   return (
     <div className="tabs">
       <header>
-        <div className="tabsBar">
-          {tabList}
-        </div>
+        <div className="tabsBar">{tabList}</div>
       </header>
-      <div className="tabContent">
-        {currentTabContent}
-      </div>
+      <div className="tabContent">{currentTabContent}</div>
     </div>
   );
 }

@@ -1,9 +1,9 @@
-import React from 'react';
-import Tabs from './Tabs.js';
-import TeamSelection from './TeamSelection.js';
-import SetTeams from './SetTeams.js';
-import './GameInput.css';
-import './App.css';
+import React from "react";
+import Tabs from "./Tabs.js";
+import TeamSelection from "./TeamSelection.js";
+import SetTeams from "./SetTeams.js";
+import "./GameInput.css";
+import "./App.css";
 
 class GameInput extends React.Component {
   constructor(props) {
@@ -17,34 +17,36 @@ class GameInput extends React.Component {
     const tabsData = this.props.games.map((game, index) => {
       return {
         tabName: game.gameName,
-        renderTabContent: (() => {
+        renderTabContent: () => {
           return (
             <ConfigureGame
               game={game}
               players={this.props.players}
               onChangePlayers={(players) => this.props.onChangePlayers(players)}
-              onChange={(game) => this.props.onChange(this.editGames(game, index))}
-            >
-            </ConfigureGame>
+              onChange={(game) =>
+                this.props.onChange(this.editGames(game, index))
+              }
+            ></ConfigureGame>
           );
-        }),
-      }
+        },
+      };
     });
     tabsData.push({
       tabName: "Add New Game",
-      renderTabContent: (() => {
+      renderTabContent: () => {
         return (
           <NewGame
-            onSubmit={(game) => this.props.onChange(this.editGames(game, this.props.games.length))}
-          >
-          </NewGame>
+            onSubmit={(game) =>
+              this.props.onChange(this.editGames(game, this.props.games.length))
+            }
+          ></NewGame>
         );
-      })
-    })
+      },
+    });
     return {
       tabsData: tabsData,
       activeTabIndex: this.state.activeTabIndex,
-    }
+    };
   }
 
   handleClick(index) {
@@ -62,14 +64,12 @@ class GameInput extends React.Component {
       <Tabs
         tabs={this.buildTabs(this.props.games)}
         onClick={(index) => this.handleClick(index)}
-      >
-      </Tabs>
+      ></Tabs>
     );
   }
 }
 
 export default GameInput;
-
 
 class ConfigureGame extends React.Component {
   updateGame(winners, teams, gameData) {
@@ -88,37 +88,39 @@ class ConfigureGame extends React.Component {
 
   getGetTeam(team) {
     if (team.sourceType === "number") {
-      return () => team
-    }
-    else if (team.sourceType === "rank") {
-      return () => this.props.game.gameData[team.sourceRound].roundData[team.sourceSubRound].subRoundData.leaderboard[team.rank].getTeam();
+      return () => team;
+    } else if (team.sourceType === "rank") {
+      return () =>
+        this.props.game.gameData[team.sourceRound].roundData[
+          team.sourceSubRound
+        ].subRoundData.leaderboard[team.rank].getTeam();
     } else {
-      const message = `buildFixture team had no sourceType team = ${team}`
-      console.warn(message)
+      const message = `buildFixture team had no sourceType team = ${team}`;
+      console.warn(message);
       return () => message;
     }
   }
 
   buildFixture(teams) {
-    return teams.map(teamReference => {
-      return ({
+    return teams.map((teamReference) => {
+      return {
         teamReference: teamReference,
-        points: ""
-      });
+        points: "",
+      };
     });
   }
 
   buildFixtures() {
-    let game = this.props.game
+    let game = this.props.game;
     game.gameData.forEach((round) => {
       round.roundData.forEach((subRound) => {
-        const subRoundData = subRound.subRoundData
-        let includedTeams = subRound.includedTeams //.map(team => this.getGetTeam(team));
+        const subRoundData = subRound.subRoundData;
+        let includedTeams = subRound.includedTeams; //.map(team => this.getGetTeam(team));
         if (subRoundData.type === "headToHead") {
           if (includedTeams.length >= 2) {
             subRoundData.fixtures = [this.buildFixture(includedTeams)];
-            subRoundData.leaderboard = includedTeams.map(teamReference => {
-              return {teamReference: teamReference}
+            subRoundData.leaderboard = includedTeams.map((teamReference) => {
+              return { teamReference: teamReference };
             });
           }
         } else if (subRoundData.type === "roundRobin") {
@@ -131,15 +133,15 @@ class ConfigureGame extends React.Component {
             });
           }
           subRoundData.fixtures = fixtures.slice();
-          subRoundData.leaderboard = includedTeams.map(teamReference => {
-            return ({
+          subRoundData.leaderboard = includedTeams.map((teamReference) => {
+            return {
               points: 0,
               pointDifference: 0,
               fixtures: subRoundData.fixtures.map(() => {
-                return { points: 0, pointDifference: 0 }
+                return { points: 0, pointDifference: 0 };
               }),
               teamReference: teamReference,
-            });
+            };
           });
         }
       });
@@ -155,30 +157,32 @@ class ConfigureGame extends React.Component {
           players={this.props.players}
           gameName={this.props.game.gameName}
           onChangePlayers={(players) => this.props.onChangePlayers(players)}
-        >
-        </GamePlayers>
+        ></GamePlayers>
         <SetTeams
           players={this.props.players}
           game={this.props.game}
-          onChangeTeams={(teams) => this.props.onChange(this.updateGame(null, teams, null))}
-          onChangeWinners={(winners) => this.props.onChange(this.updateGame(winners, null, null))}
-        >
-        </SetTeams>
+          onChangeTeams={(teams) =>
+            this.props.onChange(this.updateGame(null, teams, null))
+          }
+          onChangeWinners={(winners) =>
+            this.props.onChange(this.updateGame(winners, null, null))
+          }
+        ></SetTeams>
         <GameData
           game={this.props.game}
-          onChange={(gameData) => this.props.onChange(this.updateGame(null, null, gameData))}
-        >
-        </GameData>
-        <button
-          onClick={() => this.props.onChange(this.buildFixtures())}
-        >
+          onChange={(gameData) =>
+            this.props.onChange(this.updateGame(null, null, gameData))
+          }
+        ></GameData>
+        <button onClick={() => this.props.onChange(this.buildFixtures())}>
           Build Fixtures
         </button>
         <Winners
           game={this.props.game}
-          onChange={(winners) => this.props.onChange(this.updateGame(winners, null, null))}
-        >
-        </Winners>
+          onChange={(winners) =>
+            this.props.onChange(this.updateGame(winners, null, null))
+          }
+        ></Winners>
       </div>
     );
   }
@@ -191,7 +195,7 @@ class Winners extends React.Component {
       winners[index].team = team;
     }
     if (points) {
-      console.log(points)
+      console.log(points);
       winners[index].points = parseInt(points);
     }
     return winners;
@@ -200,9 +204,7 @@ class Winners extends React.Component {
   render() {
     const gameWinners = this.props.game.winners.map((winner, index) => {
       return (
-        <div
-          key={index}
-        >
+        <div key={index}>
           <h5>{`Rank: ${index + 1}`}</h5>
           {/* TODO: Find a better way to allow any round number rather than just setting to 10 */}
           <TeamSelection
@@ -210,16 +212,20 @@ class Winners extends React.Component {
             roundNumber={10}
             game={this.props.game}
             teamNumber={index + 1}
-            onChange={(team) => this.props.onChange(this.updateWinners(team, null, index))}
-          >
-          </TeamSelection>
+            onChange={(team) =>
+              this.props.onChange(this.updateWinners(team, null, index))
+            }
+          ></TeamSelection>
           Points:
           <input
             type="number"
             value={winner.points}
-            onChange={(event) => this.props.onChange(this.updateWinners(null, event.target.value, index))}
-          >
-          </input>
+            onChange={(event) =>
+              this.props.onChange(
+                this.updateWinners(null, event.target.value, index)
+              )
+            }
+          ></input>
         </div>
       );
     });
@@ -228,7 +234,7 @@ class Winners extends React.Component {
         <h3>Winners Points: </h3>
         {gameWinners}
       </div>
-    )
+    );
   }
 }
 
@@ -261,9 +267,10 @@ class GameData extends React.Component {
           roundNumber={index}
           game={this.props.game}
           round={round}
-          onChange={(round) => this.props.onChange(this.updateRound(round, index))}
-        >
-        </Round>
+          onChange={(round) =>
+            this.props.onChange(this.updateRound(round, index))
+          }
+        ></Round>
       );
     });
     return (
@@ -273,17 +280,11 @@ class GameData extends React.Component {
           <tbody>
             {rounds}
             <tr>
-              <td
-                colSpan="100%"
-              >
-                <button
-                  onClick={() => this.props.onChange(this.addRound())}
-                >
+              <td colSpan="100%">
+                <button onClick={() => this.props.onChange(this.addRound())}>
                   Add Game Round
                 </button>
-                <button
-                  onClick={() => this.props.onChange(this.removeRound())}
-                >
+                <button onClick={() => this.props.onChange(this.removeRound())}>
                   Remove Game Round
                 </button>
               </td>
@@ -315,7 +316,7 @@ class Round extends React.Component {
         fixtures: [],
       },
     });
-    round.roundData = roundData
+    round.roundData = roundData;
     return round;
   }
 
@@ -336,28 +337,23 @@ class Round extends React.Component {
           subRoundNumber={index}
           game={this.props.game}
           subRound={this.props.round.roundData[index]}
-          onChange={(subRound) => this.props.onChange(this.updateSubRound(subRound, index))}
-        >
-        </SubRound>
+          onChange={(subRound) =>
+            this.props.onChange(this.updateSubRound(subRound, index))
+          }
+        ></SubRound>
       );
     });
     return (
-      <tr
-        className="round"
-      >
+      <tr className="round">
         <td>
           <h5>{`Round: ${this.props.roundNumber + 1}`}</h5>
         </td>
         {subRounds}
         <td>
-          <button
-            onClick={() => this.props.onChange(this.addSubRound())}
-          >
+          <button onClick={() => this.props.onChange(this.addSubRound())}>
             Add Sub Round
           </button>
-          <button
-            onClick={() => this.props.onChange(this.removeSubRound())}
-          >
+          <button onClick={() => this.props.onChange(this.removeSubRound())}>
             Remove Sub Round
           </button>
         </td>
@@ -377,7 +373,7 @@ class SubRound extends React.Component {
 
   addTeam() {
     const subRound = this.props.subRound;
-    const includedTeams = this.props.subRound.includedTeams.slice()
+    const includedTeams = this.props.subRound.includedTeams.slice();
     includedTeams.push({});
     subRound.includedTeams = includedTeams;
     return subRound;
@@ -385,7 +381,7 @@ class SubRound extends React.Component {
 
   removeTeam() {
     const subRound = this.props.subRound;
-    const includedTeams = this.props.subRound.includedTeams.slice()
+    const includedTeams = this.props.subRound.includedTeams.slice();
     includedTeams.pop();
     subRound.includedTeams = includedTeams;
     return subRound;
@@ -404,59 +400,57 @@ class SubRound extends React.Component {
   }
 
   render() {
-    const teamsSelection = this.props.subRound.includedTeams.map((team, index) => {
-      return (
-        <TeamSelection
-          key={index}
-          team={team}
-          roundNumber={this.props.roundNumber}
-          game={this.props.game}
-          teamNumber={index + 1}
-          onChange={(team) => this.props.onChange(this.updateTeams(team, index))}
-        >
-        </TeamSelection>
-      );
-    });
+    const teamsSelection = this.props.subRound.includedTeams.map(
+      (team, index) => {
+        return (
+          <TeamSelection
+            key={index}
+            team={team}
+            roundNumber={this.props.roundNumber}
+            game={this.props.game}
+            teamNumber={index + 1}
+            onChange={(team) =>
+              this.props.onChange(this.updateTeams(team, index))
+            }
+          ></TeamSelection>
+        );
+      }
+    );
     return (
-      <td
-        className="subRound"
-      >
+      <td className="subRound">
         <h5>{`Sub Round: ${this.props.subRoundNumber + 1}`}</h5>
         Sub round name:
         <input
           type="text"
           value={this.props.subRound.subRoundData.name}
           placeholder="Enter sub round name"
-          onChange={(event) => this.props.onChange(this.updateName(event.target.value))}
-        >
-        </input>
+          onChange={(event) =>
+            this.props.onChange(this.updateName(event.target.value))
+          }
+        ></input>
         Sub round type:
         <select
           value={this.props.subRound.subRoundData.type}
-          onChange={(event) => this.props.onChange(this.updateType(event.target.value))}
+          onChange={(event) =>
+            this.props.onChange(this.updateType(event.target.value))
+          }
         >
           <option value={undefined}>Select sub round type</option>
           <option value="headToHead">Head to head</option>
           <option value="roundRobin">Round robin</option>
         </select>
         {teamsSelection}
-        <div
-          key="buttons"
-        >
-          <button
-            onClick={() => this.props.onChange(this.addTeam())}
-          >
+        <div key="buttons">
+          <button onClick={() => this.props.onChange(this.addTeam())}>
             Add Team
           </button>
-          <button
-            onClick={() => this.props.onChange(this.removeTeam())}
-          >
+          <button onClick={() => this.props.onChange(this.removeTeam())}>
             Remove Team
           </button>
         </div>
       </td>
-    )
-  };
+    );
+  }
 }
 
 class GamePlayers extends React.Component {
@@ -473,17 +467,16 @@ class GamePlayers extends React.Component {
   render() {
     const gamePlayers = this.props.players.map((player, index) => {
       return (
-        <li
-          key={index}
-        >
+        <li key={index}>
           <div>
             {player.playerName}
             <input
               type="checkbox"
-              onChange={() => this.props.onChangePlayers(this.updatePlayers(index))}
-              checked={!(player.excludedGames.has(this.props.gameName))}
-            >
-            </input>
+              onChange={() =>
+                this.props.onChangePlayers(this.updatePlayers(index))
+              }
+              checked={!player.excludedGames.has(this.props.gameName)}
+            ></input>
           </div>
         </li>
       );
@@ -491,9 +484,7 @@ class GamePlayers extends React.Component {
     return (
       <div className="gamePlayers">
         <h3>Included Players: </h3>
-        <ol>
-          {gamePlayers}
-        </ol>
+        <ol>{gamePlayers}</ol>
       </div>
     );
   }
@@ -504,7 +495,7 @@ class NewGame extends React.Component {
     super(props);
     this.state = {
       gameName: "",
-    }
+    };
   }
 
   buildNewGame() {
@@ -543,11 +534,8 @@ class NewGame extends React.Component {
           autoFocus={true}
           onChange={(event) => this.handleChange(event.target.value)}
           onKeyDown={(event) => this.handleKeyDown(event.keyCode)}
-        >
-        </input>
-        <button
-          onClick={() => this.props.onSubmit(this.buildNewGame())}
-        >
+        ></input>
+        <button onClick={() => this.props.onSubmit(this.buildNewGame())}>
           Add Game
         </button>
       </div>
