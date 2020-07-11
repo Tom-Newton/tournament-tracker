@@ -100,9 +100,9 @@ class ConfigureGame extends React.Component {
   }
 
   buildFixture(teams) {
-    return teams.map(getTeam => {
+    return teams.map(teamReference => {
       return ({
-        getTeam: getTeam,
+        teamReference: teamReference,
         points: ""
       });
     });
@@ -113,12 +113,12 @@ class ConfigureGame extends React.Component {
     game.gameData.forEach((round) => {
       round.roundData.forEach((subRound) => {
         const subRoundData = subRound.subRoundData
-        let includedTeams = subRound.includedTeams.map(team => this.getGetTeam(team));
+        let includedTeams = subRound.includedTeams //.map(team => this.getGetTeam(team));
         if (subRoundData.type === "headToHead") {
           if (includedTeams.length >= 2) {
             subRoundData.fixtures = [this.buildFixture(includedTeams)];
-            subRoundData.leaderboard = includedTeams.map(getTeam => {
-              return {getTeam: getTeam}
+            subRoundData.leaderboard = includedTeams.map(teamReference => {
+              return {teamReference: teamReference}
             });
           }
         } else if (subRoundData.type === "roundRobin") {
@@ -131,14 +131,14 @@ class ConfigureGame extends React.Component {
             });
           }
           subRoundData.fixtures = fixtures.slice();
-          subRoundData.leaderboard = includedTeams.map(getTeam => {
+          subRoundData.leaderboard = includedTeams.map(teamReference => {
             return ({
               points: 0,
               pointDifference: 0,
               fixtures: subRoundData.fixtures.map(() => {
                 return { points: 0, pointDifference: 0 }
               }),
-              getTeam: getTeam,
+              teamReference: teamReference,
             });
           });
         }

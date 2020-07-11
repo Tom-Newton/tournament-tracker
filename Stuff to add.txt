@@ -3,7 +3,8 @@ Then add unique game IDs to allow for deleting games
 Fix SetTeams so the max number of teams is the number of included players not 
 the number of players there are in total ???
 
-Fix saving the state 
-
 Add robustsness for identical player names
-Change game.teams.teamData to contain getPlayer functions 
+
+Possible bug in round robin leaderboard
+
+Fix save and load

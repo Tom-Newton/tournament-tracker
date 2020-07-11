@@ -1,4 +1,5 @@
 import React from 'react';
+import getTeam from "./getTeam.js";
 import './ResultsTable.css';
 
 class ResultsTable extends React.Component {
@@ -12,11 +13,8 @@ class ResultsTable extends React.Component {
     });
     this.props.games.forEach(game => {
       game.winners.forEach(winner => {
-        let team = winner.team;
+        let team = getTeam(winner.team, game.gameData);
         try {
-          if (team.sourceType === "rank") {
-            team = game.gameData[team.sourceRound].roundData[team.sourceSubRound].subRoundData.leaderboard[team.rank].getTeam()
-          }
           const teamMembers = game.teams.teamsData[team.number]
           teamMembers.forEach(playerName => {
             const entry = leaderboard.find(entry1 => entry1.playerName === playerName)
@@ -31,9 +29,9 @@ class ResultsTable extends React.Component {
   }
   render() {
     const leaderboard = this.buildLeaderboard().map((entry, index) => {
-      const gamePoints = this.props.games.map(game => {
+      const gamePoints = this.props.games.map((game, index) => {
         return (
-          <td>{entry.gamePoints[game.gameName]}</td>
+          <td key={index}>{entry.gamePoints[game.gameName]}</td>
         );
       });
       return (
@@ -47,9 +45,9 @@ class ResultsTable extends React.Component {
         </tr>
       );
     });
-    const gameNames = this.props.games.map(game => {
+    const gameNames = this.props.games.map((game, index) => {
       return (
-        <th>{game.gameName}</th>
+        <th key={index}>{game.gameName}</th>
       );
     });
     if (leaderboard.length > 0) {
