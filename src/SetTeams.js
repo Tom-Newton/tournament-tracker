@@ -19,30 +19,32 @@ class SetTeams extends React.Component {
   }
 
   updateTeams() {
-    const unassignedPlayers = [];
+    const includedPlayers = [];
     this.props.players.forEach((player, index) => {
       if (!player.excludedGames.has(this.props.game.gameName)) {
-        unassignedPlayers.push(player.playerName);
+        includedPlayers.push(player.playerName);
       }
     });
-    const teamsData = [];
-    while (unassignedPlayers.length) {
-      let unFilledTeams = Array.from(
-        Array(this.props.game.teams.numberOfTeams).keys()
-      );
-      while (unFilledTeams.length && unassignedPlayers.length) {
-        const player = unassignedPlayers.pop();
-        const team =
-          unFilledTeams[Math.floor(Math.random() * unFilledTeams.length)];
-        if (teamsData[team]) {
-          teamsData[team].push(player);
-        } else {
-          teamsData[team] = [player];
-        }
-        unFilledTeams = unFilledTeams.filter(
-          (unfilledTeam) => unfilledTeam !== team
-        );
+    const randomisedPlayers = includedPlayers.map((player => {
+      return {
+        "player": player,
+        "randomSeed": Math.random()
       }
+    })).sort((entry0, entry1) => {
+      return entry0.randomSeed - entry1.randomSeed
+    }).map((playerAndSeed) => {
+      return playerAndSeed.player
+    })
+    const team_size = randomisedPlayers.length / this.props.game.teams.numberOfTeams
+    let division = 0;
+    let rounded_division = 0;
+    let previous_rounded_division = 0;
+    const teamsData = [];
+    for (let i = 0; i < this.props.game.teams.numberOfTeams; i++) {
+      division += team_size;
+      rounded_division = Math.round(division)
+      teamsData.push(randomisedPlayers.slice(previous_rounded_division, rounded_division))
+      previous_rounded_division = rounded_division;
     }
     const teams = this.props.game.teams;
     teams.teamsData = teamsData;
