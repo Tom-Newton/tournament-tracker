@@ -3,6 +3,7 @@ import Tabs from "./Tabs.js";
 import getTeam from "./getTeam.js";
 import "./ResultsInput.css";
 import "./App.css";
+import { isEqual } from "lodash";
 
 class ResultsInput extends React.Component {
   constructor(props) {
@@ -68,7 +69,7 @@ export default ResultsInput;
 class Round extends React.Component {
   getEntry(subRoundData, team) {
     return subRoundData.leaderboard.find(
-      (entry) => entry.teamReference === team.teamReference
+      (entry) => isEqual(entry.teamReference, team.teamReference)
     );
   }
 
@@ -113,12 +114,12 @@ class Round extends React.Component {
     } else if (subRoundData.type === "headToHead") {
       subRoundData.leaderboard = subRoundData.fixtures[0].slice();
     }
-    subRoundData.leaderboard.sort((entry1, entry2) => {
-      const pointsDifference = entry1.points - entry2.points;
+    subRoundData.leaderboard.sort((sort_entry0, sort_entry1) => {
+      const pointsDifference = sort_entry0.points - sort_entry1.points;
       if (pointsDifference === 0) {
-        const pointsDifferenceDifference =
-          entry1.pointsDifference - entry2.pointsDifference;
-        return -pointsDifferenceDifference;
+        const pointDifferenceDifference =
+          sort_entry0.pointDifference - sort_entry1.pointDifference;
+        return -pointDifferenceDifference;
       } else {
         return -pointsDifference;
       }
