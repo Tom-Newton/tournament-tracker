@@ -1,6 +1,7 @@
 import React from "react";
 import Tabs from "./Tabs.js";
-import getTeam from "./getTeam.js";
+import displayTeamMembers from "./getTeam.js";
+import SubRoundLeaderboard from "./SubRoundLeaderboard.js";
 import "./ResultsInput.css";
 import "./App.css";
 import { isEqual } from "lodash";
@@ -68,8 +69,8 @@ export default ResultsInput;
 
 class Round extends React.Component {
   getEntry(subRoundData, team) {
-    return subRoundData.leaderboard.find(
-      (entry) => isEqual(entry.teamReference, team.teamReference)
+    return subRoundData.leaderboard.find((entry) =>
+      isEqual(entry.teamReference, team.teamReference)
     );
   }
 
@@ -167,20 +168,14 @@ class SubRound extends React.Component {
     const fixtures = this.props.subRound.subRoundData.fixtures.map(
       (fixture, fixtureIndex) => {
         const teams = fixture.map((fixtureTeam, teamIndex) => {
-          const team = getTeam(fixtureTeam.teamReference, this.props.gameData);
-          let players;
-          try {
-            players = this.props.teams.teamsData[team.number].map(
-              (player, index) => {
-                return <li key={index}>{player}</li>;
-              }
-            );
-          } catch (TypeError) {
-            players = <li>{`Team: ${teamIndex + 1}`}</li>;
-          }
           return (
             <div key={teamIndex} className="team">
-              <ul className="teamList">{players}</ul>
+              {displayTeamMembers(
+                fixtureTeam.teamReference,
+                this.props.gameData,
+                this.props.teams.teamsData,
+                teamIndex
+              )}
               <input
                 type="number"
                 value={fixtureTeam.points}
@@ -208,6 +203,11 @@ class SubRound extends React.Component {
           this.props.subRound.subRoundData.name
         }`}</h5>
         {fixtures}
+        <SubRoundLeaderboard
+          subRoundData={this.props.subRound.subRoundData}
+          gameData={this.props.gameData}
+          teamsData={this.props.teams.teamsData}
+        ></SubRoundLeaderboard>
       </div>
     );
   }
