@@ -1,5 +1,5 @@
 import React from "react";
-import displayTeamMembers from "./getTeam";
+import displayTeamMembers from "./displayTeamMembers.js";
 
 function SubRoundLeaderboard(props) {
   return (

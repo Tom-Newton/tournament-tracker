@@ -1,6 +1,6 @@
 import React from "react";
 import Tabs from "./Tabs.js";
-import displayTeamMembers from "./getTeam.js";
+import displayTeamMembers from "./displayTeamMembers.js";
 import SubRoundLeaderboard from "./SubRoundLeaderboard.js";
 import "./ResultsInput.css";
 import "./App.css";
