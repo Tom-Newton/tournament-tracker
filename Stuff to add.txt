@@ -8,3 +8,8 @@ Add robustsness for identical player names
 Possible bug in round robin leaderboard
 
 Fix save and load
+
+Protect build fixtures and randomise teams after results have been entered
+Allow building playoff rounds without previous fixtures
+Avoid error when looking at empty something
+Create new game from template of another round
