@@ -1,6 +1,8 @@
 This web app is for tracking turnaments. Lots of different sports/games can be added. There is a super flexible framework for defining tournament structure including round robin and head to head knockout rounds. Teams for each round are randomised and fixtures are generated as results are entered. Results are also added up and displayed on an overall leader board.
 
-I haven't deployed this properly I've always just run it locally in a development setup by runnning `npm start`. All the data is stored in browser localstorage.
+I haven't deployed this properly I've always just run it locally in a development setup by runnning `npm start`. All the data is stored in browser localstorage. 
+
+I'm not very good at frontend stuff so the code is pretty ugly but it works.
 
 The following was generated when running create react app
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
