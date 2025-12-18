@@ -1,62 +1,51 @@
 import React from "react";
-// import { loadFile, writeFile } from "fs";
-let fs = require("fs");
 
 class SaveLoad extends React.Component {
-  editSaveLoad(savePath, loadPath) {
+  editSaveLoad(loadPath) {
     const saveLoad = this.props.saveLoad;
-    if (savePath) {
-      saveLoad.save = savePath;
-    }
     if (loadPath) {
       saveLoad.load = loadPath;
     }
     return saveLoad;
   }
+  handleSave = () => {
+    const state = localStorage.getItem("storedState");
+    const blob = new Blob([state], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "tournament-data.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  handleLoad = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const state = e.target.result;
+        console.log(state);
+        localStorage.setItem("storedState", state);
+        window.location.reload();
+      };
+      reader.readAsText(file);
+    }
+  };
   render() {
     return (
       <div>
         <div>
-          <input
-            type="text"
-            value={this.props.saveLoad.save}
-            onChange={(event) =>
-              this.props.onChange(this.editSaveLoad(event.target.value, null))
-            }
-          ></input>
-          <button
-            onClick={() =>
-              fs.writeFile(
-                this.props.saveLoad.save,
-                localStorage.getItem("storedState"),
-                function (err) {
-                  if (err) throw err;
-                  console.log("Replaced!");
-                }
-              )
-            }
-          >
+          <button onClick={this.handleSave}>
             Save
           </button>
         </div>
         <div>
           <input
-            type="text"
-            value={this.props.saveLoad.load}
-            onChange={(event) =>
-              this.props.onChange(this.editSaveLoad(null, event.target.value))
-            }
+            type="file"
+            accept=".json"
+            onChange={this.handleLoad}
           ></input>
-          <button
-            onClick={() =>
-              localStorage.setItem(
-                "storedState",
-                fs.loadFile(this.props.saveLoad.load)
-              )
-            }
-          >
-            Load
-          </button>
         </div>
       </div>
     );
