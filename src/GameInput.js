@@ -215,7 +215,7 @@ class QuickConfigure extends React.Component {
     const rightTeams = teams.slice(splitIndex);
     const leftWinner = this.getWinnerOfTeams(leftTeams, roundIndex, gameData, numberOfRounds);
     const rightWinner = this.getWinnerOfTeams(rightTeams, roundIndex, gameData, numberOfRounds);
-    
+
     const name = numberOfRounds - roundIndex === 1 ? "Final" : `Round of ${Math.pow(2, numberOfRounds - roundIndex)}`;
     gameData[roundIndex].roundData.push({
       includedTeams: [leftWinner, rightWinner],
