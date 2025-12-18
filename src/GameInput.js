@@ -195,12 +195,12 @@ class ConfigureGame extends React.Component {
 }
 
 class QuickConfigure extends React.Component {
-  getWinnerOfTeams(teams, roundIndex, roundData) {
+  getWinnerOfTeams(teams, roundIndex, roundData, numberOfRounds) {
     if (teams.length === 1) {
       return teams[0];
     }
     const sourceRound = roundIndex - 1;
-    this.build1v1KnockoutRecursive(teams, roundData, sourceRound);
+    this.build1v1KnockoutRecursive(teams, roundData, sourceRound, numberOfRounds);
     return {
       sourceType: "rank",
       sourceRound: sourceRound,
@@ -209,16 +209,18 @@ class QuickConfigure extends React.Component {
     }
   }
 
-  build1v1KnockoutRecursive(teams, gameData, roundIndex) {
+  build1v1KnockoutRecursive(teams, gameData, roundIndex, numberOfRounds) {
     const splitIndex = Math.ceil(teams.length / 2);
     const leftTeams = teams.slice(0, splitIndex);
     const rightTeams = teams.slice(splitIndex);
-    const leftWinner = this.getWinnerOfTeams(leftTeams, roundIndex, gameData);
-    const rightWinner = this.getWinnerOfTeams(rightTeams, roundIndex, gameData);
+    const leftWinner = this.getWinnerOfTeams(leftTeams, roundIndex, gameData, numberOfRounds);
+    const rightWinner = this.getWinnerOfTeams(rightTeams, roundIndex, gameData, numberOfRounds);
+    
+    const name = numberOfRounds - roundIndex === 1 ? "Final" : `Round of ${Math.pow(2, numberOfRounds - roundIndex)}`;
     gameData[roundIndex].roundData.push({
       includedTeams: [leftWinner, rightWinner],
       subRoundData: {
-        name: "",
+        name: name,
         leaderboard: [],
         fixtures: [],
         type: "headToHead",
@@ -230,7 +232,7 @@ class QuickConfigure extends React.Component {
     const teams = Array.from(Array(this.props.game.teams.numberOfTeams).keys().map(i => ({number: i, sourceType: "number"})));
 
     let gameData = Array.from({length: numberOfRounds}, () => ({roundData: []}));
-    this.build1v1KnockoutRecursive(teams, gameData, numberOfRounds - 1);
+    this.build1v1KnockoutRecursive(teams, gameData, numberOfRounds - 1, numberOfRounds);
     this.props.onChange(gameData)
   }
   render() {
