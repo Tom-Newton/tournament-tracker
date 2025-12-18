@@ -64,10 +64,7 @@ class App extends React.Component {
         tabName: "Save/Load",
         renderTabContent: () => {
           return (
-            <SaveLoad
-              saveLoad={this.state.saveLoad}
-              onChange={(saveLoad) => this.handleChange("saveLoad", saveLoad)}
-            />
+            <SaveLoad/>
           );
         },
       },
@@ -79,10 +76,6 @@ class App extends React.Component {
       },
       players: [],
       games: [],
-      saveLoad: {
-        save: "",
-        load: "",
-      },
     };
 
     const restoredState = JSON.parse(
@@ -132,9 +125,6 @@ class App extends React.Component {
         break;
       case "games":
         this.setState({ games: object });
-        break;
-      case "saveLoad":
-        this.setState({ saveLoad: object });
         break;
       default:
         break;

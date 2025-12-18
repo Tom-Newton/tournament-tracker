@@ -1,13 +1,6 @@
 import React from "react";
 
 class SaveLoad extends React.Component {
-  editSaveLoad(loadPath) {
-    const saveLoad = this.props.saveLoad;
-    if (loadPath) {
-      saveLoad.load = loadPath;
-    }
-    return saveLoad;
-  }
   handleSave = () => {
     const state = localStorage.getItem("storedState");
     const blob = new Blob([state], { type: "application/json" });
