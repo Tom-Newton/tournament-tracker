@@ -1,9 +1,9 @@
 import React from "react";
+import "./App.css";
+import "./GameInput.css";
+import SetTeams from "./SetTeams.js";
 import Tabs from "./Tabs.js";
 import TeamSelection from "./TeamSelection.js";
-import SetTeams from "./SetTeams.js";
-import "./GameInput.css";
-import "./App.css";
 
 class GameInput extends React.Component {
   constructor(props) {
@@ -183,7 +183,81 @@ class ConfigureGame extends React.Component {
             this.props.onChange(this.updateGame(winners, null, null))
           }
         ></Winners>
+        <QuickConfigure
+          game={this.props.game}
+          onChange={(winners, gameData) =>
+            this.props.onChange(this.updateGame(winners, null, gameData))
+          }
+        ></QuickConfigure>
       </div>
+    );
+  }
+}
+
+class QuickConfigure extends React.Component {
+  getWinnerOfTeams(teams, roundIndex, roundData, left) {
+    if (teams.length === 1) {
+      return teams[0];
+    }
+    const sourceRound = roundIndex - 1;
+    this.build1v1KnockoutRecursive(teams, roundData, sourceRound);
+    const offset = left ? 0 : 1;
+    return {
+      sourceType: "rank",
+      sourceRound: sourceRound,
+      sourceSubRound: roundData[sourceRound].roundData.length - 1,
+      rank: 0,
+    }
+  }
+
+  build1v1KnockoutRecursive(teams, gameData, roundIndex) {
+
+    // if (teams.length <= 2) {
+    //   const name = roundIndex === 0 ? "Final" : `Round of ${Math.pow(2, Math.abs(roundIndex))}`;
+    //   roundData[roundIndex].push({
+    //     includedTeams: teams,
+    //     subRoundData: {
+    //       name: name,
+    //       fixtures: [],
+    //       leaderboard: [],
+    //     },
+    //   });
+    // }
+    console.log(teams);
+    console.log(gameData);
+    console.log(roundIndex);
+    console.log(gameData[roundIndex])
+    const splitIndex = Math.ceil(teams.length / 2);
+    const leftTeams = teams.slice(0, splitIndex);
+    const rightTeams = teams.slice(splitIndex);
+    const leftWinner = this.getWinnerOfTeams(leftTeams, roundIndex, gameData, true);
+    const rightWinner = this.getWinnerOfTeams(rightTeams, roundIndex, gameData, false);
+    gameData[roundIndex].roundData.push({
+      includedTeams: [leftWinner, rightWinner],
+      subRoundData: {
+        name: "",
+        leaderboard: [],
+        fixtures: [],
+      },
+    })
+  }
+  configure1v1Knockout = () => {
+    const numberOfRounds = Math.ceil(Math.log2(this.props.game.teams.numberOfTeams));
+    console.log(numberOfRounds);
+    console.log(this.props.game);
+    const teams = Array.from(Array(this.props.game.teams.numberOfTeams).keys().map(i => ({number: i, sourceType: "number"})));
+
+    let gameData = Array.from({length: numberOfRounds}, () => ({roundData: []}));
+    this.build1v1KnockoutRecursive(teams, gameData, numberOfRounds - 1);
+    console.log(gameData);
+    this.props.onChange(null, gameData)
+  }
+  render() {
+    return (
+    <div>
+      <h3>Quick Configure:</h3>
+      <button onClick={this.configure1v1Knockout}>1v1 Knockout</button>
+    </div>
     );
   }
 }
